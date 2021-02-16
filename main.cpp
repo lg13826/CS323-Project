@@ -6,12 +6,12 @@
 
 bool isOperator(std::string str)
 {
-	
+	return false;
 }
 
 bool isSeperator(std::string str)
 {
-
+	return false;
 }
 
 bool isIdentifier(std::string str)
@@ -36,7 +36,7 @@ bool isIdentifier(std::string str)
 
 bool isKeyword(std::string str)
 {
-
+	return false;
 }
 
 int main()

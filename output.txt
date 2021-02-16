@@ -1,1 +1,29 @@
-t39f 0a-2t9 %!#t 
+TOKENS		Lexemes
+
+!
+IDENTIFIER	=	Find
+IDENTIFIER	=	the
+IDENTIFIER	=	largest
+IDENTIFIER	=	value
+IDENTIFIER	=	between
+IDENTIFIER	=	two
+numbers!
+IDENTIFIER	=	int
+num1,
+num2$,
+IDENTIFIER	=	large_num
+;
+if(num1
+>
+num2$)
+{
+IDENTIFIER	=	large_num
+=
+num1;
+}
+IDENTIFIER	=	else
+{
+IDENTIFIER	=	large_num
+=
+num2$;
+}
