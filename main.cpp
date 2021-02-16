@@ -4,7 +4,17 @@
 #include <locale>
 //include additional function files here
 
-bool isIdentifier(string str)
+bool isOperator(std::string str)
+{
+	
+}
+
+bool isSeperator(std::string str)
+{
+
+}
+
+bool isIdentifier(std::string str)
 {
 	//identifier
 	for(int i = 0; i < str.length(); i++)
@@ -22,6 +32,11 @@ bool isIdentifier(string str)
 		}
 	}
 	return true;
+}
+
+bool isKeyword(std::string str)
+{
+
 }
 
 int main()
