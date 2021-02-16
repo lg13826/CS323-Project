@@ -1,17 +1,21 @@
 #include <iostream>
 #include <fstream>
+#include <string>
 //include additional function files here
 
-bool isIdentifier(char ch) 
+bool isIdentifier(std::string str) 
 {
-//identifier
-	if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || ch =='$' || ch == '_' )
+	//identifier
+	for(int i = 0; i < str.length(); i++)
 	{
-		return true;
-	}
-	else
-	{
-		return false;
+		if ((str[i] >= 'A' && str[i] <= 'Z') || (str[i] >= 'a' && str[i] <= 'z') || str[i] =='$' || str[i] == '_' )
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }
 
