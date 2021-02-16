@@ -58,21 +58,21 @@ int main()
 		int type;
 		inputf >> entity;
 
-		if (isKeyword(entity))
+		if (isOperator(entity))
 		{
-			outputf << "KEYWORD" << '\t' << '=' << '\t';
-		}
-		else if (isIdentifier(entity))
-		{
-			outputf << "IDENTIFIER" << '\t' << '=' << '\t';
+			outputf << "OPERATOR" << '\t' << '=' << '\t';
 		}
 		else if (isSeperator(entity))
 		{
 			outputf << "SEPERATOR" << '\t' << '=' << '\t';
 		}
-		else if (isOperator(entity))
+		else if (isIdentifier(entity))
 		{
-			outputf << "OPERATOR" << '\t' << '=' << '\t';
+			outputf << "IDENTIFIER" << '\t' << '=' << '\t';
+		}
+		else if (isKeyword(entity))
+		{
+			outputf << "KEYWORD" << '\t' << '=' << '\t';
 		}
 
 		outputf << entity << std::endl;		
