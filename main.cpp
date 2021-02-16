@@ -2,6 +2,18 @@
 #include <fstream>
 //include additional function files here
 
+bool isIdentifier(char ch) 
+{
+//identifier
+	if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || ch =='$' || ch == '_' )
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
 int main()
 {
