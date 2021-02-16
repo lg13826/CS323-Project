@@ -1,13 +1,6 @@
 TOKENS		Lexemes
 
 !
-IDENTIFIER	=	Find
-IDENTIFIER	=	the
-IDENTIFIER	=	largest
-IDENTIFIER	=	value
-IDENTIFIER	=	between
-IDENTIFIER	=	two
-numbers!
 IDENTIFIER	=	int
 num1,
 num2$,

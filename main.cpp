@@ -4,6 +4,19 @@
 #include <locale>
 //include additional function files here
 
+void ignoreComment(std::string str, std::ifstream &inputf)
+{
+	char checker;
+	if(str[0] == '!') // check if there's a comment symbol.
+	{
+		do // read through the file until it reaches the last !
+		{
+			inputf >> checker; 
+		} while (checker != '!');
+	}
+
+}
+
 bool isOperator(std::string str)
 {
 	return false;
@@ -55,9 +68,9 @@ int main()
 
 	while (inputf.eof() == false) // go through input.txt and read each word.
 	{
-		int type;
+		ignoreComment(entity, inputf);
+				
 		inputf >> entity;
-
 		if (isOperator(entity))
 		{
 			outputf << "OPERATOR" << '\t' << '=' << '\t';
