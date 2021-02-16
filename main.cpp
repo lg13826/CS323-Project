@@ -1,22 +1,27 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <locale>
 //include additional function files here
 
-bool isIdentifier(std::string str) 
+bool isIdentifier(string str)
 {
 	//identifier
 	for(int i = 0; i < str.length(); i++)
 	{
-		if ((str[i] >= 'A' && str[i] <= 'Z') || (str[i] >= 'a' && str[i] <= 'z') || str[i] =='$' || str[i] == '_' )
+		if (isalpha(str[i]) || str[i] =='$' || str[i] == '_'
+		    || (str[i] >= '0' && str[i] <= '9'))
 		{
-			return true;
+			// testing where it stops reading
+			// cout << str[i];
+			continue;
 		}
 		else
 		{
 			return false;
 		}
 	}
+	return true;
 }
 
 int main()
