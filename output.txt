@@ -1,22 +1,2 @@
 TOKENS		Lexemes
 
-!
-IDENTIFIER	=	int
-num1,
-num2$,
-IDENTIFIER	=	large_num
-;
-if(num1
->
-num2$)
-{
-IDENTIFIER	=	large_num
-=
-num1;
-}
-IDENTIFIER	=	else
-{
-IDENTIFIER	=	large_num
-=
-num2$;
-}

@@ -2,27 +2,28 @@
 #include <fstream>
 #include <string>
 #include <locale>
+#include <vector>
+
 //include additional function files here
 
-void ignoreComment(std::string str, std::ifstream &inputf)
+void ignoreComment(char character, std::ifstream &inputf)
 {
-	char checker;
-	if(str[0] == '!') // check if there's a comment symbol.
+	if(character == '!') // check if there's a comment symbol.
 	{
 		do // read through the file until it reaches the last !
 		{
-			inputf >> checker; 
-		} while (checker != '!');
+			inputf >> character; 
+		} while (character != '!');
 	}
 
 }
 
-bool isOperator(std::string str)
+bool isOperator(char character)
 {
 	return false;
 }
 
-bool isSeperator(std::string str)
+bool isSeperator(char character)
 {
 	return false;
 }
@@ -54,7 +55,7 @@ bool isKeyword(std::string str)
 
 int main()
 {
-	std::string entity;
+	char entity;
 	std::ifstream inputf("input.txt");
 	std::ofstream outputf("output.txt");
 	outputf << "TOKENS" << '\t' << '\t' << "Lexemes" << std::endl << std::endl;
@@ -66,6 +67,9 @@ int main()
 		return 1;
 	}
 
+	std::vector<char> word; // this will push characters into a vector for when word is being processed...
+	bool wordFormulation = false; // this will be a sentry value to check if word formulation is being done, default false.
+
 	while (inputf.eof() == false) // go through input.txt and read each word.
 	{
 		ignoreComment(entity, inputf);
@@ -73,20 +77,34 @@ int main()
 		inputf >> entity;
 		if (isOperator(entity))
 		{
-			outputf << "OPERATOR" << '\t' << '=' << '\t';
+			outputf << "OPERATOR" << '\t' << '=' << '\t' << entity << std::endl;
 		}
 		else if (isSeperator(entity))
 		{
-			outputf << "SEPERATOR" << '\t' << '=' << '\t';
+			outputf << "SEPERATOR" << '\t' << '=' << '\t' << entity << std::endl;
 		}
-		else if (isIdentifier(entity))
+		else do //most likely a word, start building the word using characters
 		{
-			outputf << "IDENTIFIER" << '\t' << '=' << '\t';
-		}
-		else if (isKeyword(entity))
+			wordFormulation = true;
+			word.push_back(entity);
+			inputf >> entity;
+		} while (!isOperator(entity) || !isSeperator(entity)); // keep looping until a seperator or operator is encountered....
+		
+		if(wordFormulation == true)
 		{
-			outputf << "KEYWORD" << '\t' << '=' << '\t';
-		}
+			static std::string wordString(word.begin(), word.end()); //convert character vector to string for reading in functions
+			if (isIdentifier(wordString))
+			{
+				outputf << "OPERATOR" << '\t' << '=' << '\t' << wordString << std::endl;
+			}
+			else if (isKeyword(wordString))
+			{
+				outputf << "KEYWORD" << '\t' << '=' << '\t' << wordString << std::endl;
+			}
+			inputf.unget(); // move pointer backwards for next iteration, it's going to end up skipping a letter if this isn't done.
+			word.clear(); // clear word
+			wordFormulation = false;
+		}		
 
 		outputf << entity << std::endl;		
 	}
