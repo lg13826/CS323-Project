@@ -87,9 +87,9 @@ int main()
 		{
 			wordFormulation = true;
 			word.push_back(entity);
-			inputf >> entity;
-		} while (!isOperator(entity) || !isSeperator(entity)); // keep looping until a seperator or operator is encountered....
-		
+			inputf >> std::noskipws >> entity;
+		} while (!isOperator(entity) || !isSeperator(entity) || ' '); // keep looping until a seperator, operator or whitespace is encountered....
+
 		if(wordFormulation == true)
 		{
 			static std::string wordString(word.begin(), word.end()); //convert character vector to string for reading in functions
@@ -104,6 +104,7 @@ int main()
 			inputf.unget(); // move pointer backwards for next iteration, it's going to end up skipping a letter if this isn't done.
 			word.clear(); // clear word
 			wordFormulation = false;
+			inputf >> std::skipws; // re-enable whitespace skipping for next iteration
 		}		
 
 		outputf << entity << std::endl;		
