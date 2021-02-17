@@ -88,7 +88,7 @@ int main()
 			wordFormulation = true;
 			word.push_back(entity);
 			inputf >> std::noskipws >> entity;
-		} while (!isOperator(entity) || !isSeperator(entity) || ' '); // keep looping until a seperator, operator or whitespace is encountered....
+		} while (!isOperator(entity) || !isSeperator(entity) || entity == ' '); // keep looping until a seperator, operator or whitespace is encountered....
 
 		if(wordFormulation == true)
 		{
