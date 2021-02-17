@@ -107,7 +107,7 @@ int main()
 			inputf >> std::skipws; // re-enable whitespace skipping for next iteration
 		}		
 
-		outputf << entity << std::endl;		
+		// outputf << entity << std::endl; <-- i don't remember what this is supposed to do. commented out for now.	
 	}
 
 	inputf.close();
