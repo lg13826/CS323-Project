@@ -1,2 +1,7 @@
 TOKENS		Lexemes
 
+IDENTIFIER	=	int
+IDENTIFIER	=	large_num
+IDENTIFIER	=	large_num
+IDENTIFIER	=	else
+IDENTIFIER	=	large_num

@@ -8,14 +8,10 @@
 
 void ignoreComment(char character, std::ifstream &inputf)
 {
-	if(character == '!') // check if there's a comment symbol.
+	do // read through the file until it reaches the last !
 	{
-		do // read through the file until it reaches the last !
-		{
-			inputf >> character; 
-		} while (character != '!');
-	}
-
+		inputf >> character; 
+	} while (character != '!');
 }
 
 bool isOperator(char character)
@@ -71,10 +67,14 @@ int main()
 	bool wordFormulation = false; // this will be a sentry value to check if word formulation is being done, default false.
 
 	while (inputf.eof() == false) // go through input.txt and read each word.
-	{
-		ignoreComment(entity, inputf);
-				
+	{	
 		inputf >> entity;
+		if (entity == '!')
+		{
+			ignoreComment(entity, inputf);
+			continue;
+		}
+		
 		if (isOperator(entity))
 		{
 			outputf << "OPERATOR" << '\t' << '=' << '\t' << entity << std::endl;
@@ -88,26 +88,25 @@ int main()
 			wordFormulation = true;
 			word.push_back(entity);
 			inputf >> std::noskipws >> entity;
-		} while (!isOperator(entity) || !isSeperator(entity) || entity == ' '); // keep looping until a seperator, operator or whitespace is encountered....
+			std::cout << entity;
+		} while (!isOperator(entity) && !isSeperator(entity) && entity != ' ' && entity != '\n' && inputf.eof() == false); // keep looping until a seperator, operator or whitespace is encountered....
 
 		if(wordFormulation == true)
 		{
-			static std::string wordString(word.begin(), word.end()); //convert character vector to string for reading in functions
-			if (isIdentifier(wordString))
-			{
-				outputf << "OPERATOR" << '\t' << '=' << '\t' << wordString << std::endl;
-			}
-			else if (isKeyword(wordString))
+			std::string wordString(word.begin(), word.end()); //convert character vector to string for reading in functions
+			if (isKeyword(wordString))
 			{
 				outputf << "KEYWORD" << '\t' << '=' << '\t' << wordString << std::endl;
 			}
-			inputf.unget(); // move pointer backwards for next iteration, it's going to end up skipping a letter if this isn't done.
+			else if (isIdentifier(wordString))
+			{
+				outputf << "IDENTIFIER" << '\t' << '=' << '\t' << wordString << std::endl;
+			}
+			//inputf.unget(); // move pointer backwards for next iteration, it's going to end up skipping a letter if this isn't done.
 			word.clear(); // clear word
 			wordFormulation = false;
 			inputf >> std::skipws; // re-enable whitespace skipping for next iteration
 		}		
-
-		// outputf << entity << std::endl; <-- i don't remember what this is supposed to do. commented out for now.	
 	}
 
 	inputf.close();
