@@ -10,7 +10,7 @@ void ignoreComment(char character, std::ifstream &inputf)
 {
 	do // read through the file until it reaches the last !
 	{
-		inputf >> character; 
+		inputf >> character;
 	} while (character != '!');
 }
 
@@ -56,6 +56,17 @@ bool isIdentifier(std::string str)
 
 bool isKeyword(std::string str)
 {
+	std::vector <std::string> library {"int" ,"float", "bool", "true", "False",
+																"if", "else", "then", "endif", "endelse",
+															  "while", "whileend", "do", "enddo", "for",
+															  "endfor", "STDinput", "STDoutput", "and",
+															   "or", "not"};
+	for(int i = 0; i< library.size()-1; i++){
+		if( str.compare(library[i]) == 0){
+			return true;
+		}
+	}
+
 	return false;
 }
 
@@ -77,14 +88,14 @@ int main()
 	bool wordFormulation = false; // this will be a sentry value to check if word formulation is being done, default false.
 
 	while (inputf.eof() == false) // go through input.txt and read each word.
-	{	
+	{
 		inputf >> entity;
 		if (entity == '!')
 		{
 			ignoreComment(entity, inputf);
 			continue;
 		}
-		
+
 		if (isOperator(entity))
 		{
 			outputf << "OPERATOR" << '\t' << '=' << '\t' << entity << std::endl;
@@ -116,7 +127,7 @@ int main()
 			word.clear(); // clear word
 			wordFormulation = false;
 			inputf >> std::skipws; // re-enable whitespace skipping for next iteration
-		}		
+		}
 	}
 
 	inputf.close();
