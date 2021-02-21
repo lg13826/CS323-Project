@@ -124,6 +124,14 @@ int main()
 			{
 				outputf << "IDENTIFIER" << '\t' << '=' << '\t' << wordString << std::endl;
 			}
+			if (isOperator(entity))
+			{
+				outputf << "OPERATOR" << '\t' << '=' << '\t' << entity << std::endl;
+			}
+			else if (isSeperator(entity))
+			{
+				outputf << "SEPERATOR" << '\t' << '=' << '\t' << entity << std::endl;
+			}
 			//inputf.unget(); // move pointer backwards for next iteration, it's going to end up skipping a letter if this isn't done.
 			word.clear(); // clear word
 			wordFormulation = false;
