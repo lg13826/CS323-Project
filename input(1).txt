@@ -3,8 +3,6 @@ int num1, num2$, large_num ;
 if(num1 > num2$)
 {
 	large_num = num1;
-	int y = 5;
-	int z = 24.32;
 }
 else
 {

@@ -54,6 +54,36 @@ bool isIdentifier(std::string str)
 	return true;
 }
 
+bool isInteger(std::string number)
+{
+	for (int i = 0; i < number.length(); i++)
+	{
+		if (number[i] >= '0' && number[i] <= '9')
+			continue;
+		else return false;
+	}
+	return true;
+}
+
+bool isRealNumber(std::string number)
+{
+	bool firstDecimalCheck = false;
+	for (int i = 0; i < number.length(); i++) // check if the numbers left of the decimal are integers
+	{
+		if (number[i] == '.')
+		{
+			firstDecimalCheck = true;
+			continue;
+		} else if (number[i] == '.' && firstDecimalCheck) 
+			return false;
+
+		if (number[i] >= '0' && number[i] <= '9')
+			continue;
+		else return false;
+	}
+	return true;
+}
+
 bool isKeyword(std::string str)
 {
 	//vector to hold library of strings
@@ -97,7 +127,6 @@ int main()
 			ignoreComment(entity, inputf);
 			continue;
 		}
-
 		if (isOperator(entity))
 		{
 			outputf << "OPERATOR" << '\t' << '=' << '\t' << entity << std::endl;
@@ -106,7 +135,7 @@ int main()
 		{
 			outputf << "SEPERATOR" << '\t' << '=' << '\t' << entity << std::endl;
 		}
-		else do //most likely a word, start building the word using characters
+		else do //most likely a word or number, start building the word using characters
 		{
 			wordFormulation = true;
 			word.push_back(entity);
@@ -116,7 +145,15 @@ int main()
 		if(wordFormulation == true)
 		{
 			std::string wordString(word.begin(), word.end()); //convert character vector to string for reading in functions
-			if (isKeyword(wordString))
+			if (isInteger(wordString))
+			{
+				outputf << "INTEGER" << '\t' << '=' << '\t' << wordString << std::endl;
+			}
+			else if (isRealNumber(wordString))
+			{
+				outputf << "REAL" << '\t' << '=' << '\t' << wordString << std::endl;
+			}
+			else if (isKeyword(wordString))
 			{
 				outputf << "KEYWORD" << '\t' << '=' << '\t' << wordString << std::endl;
 			}
