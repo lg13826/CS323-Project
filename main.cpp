@@ -56,7 +56,7 @@ bool isIdentifier(std::string str)
 
 bool isInteger(std::string number)
 {
-	for (int i = 0; i < number.length(); i++)
+	for (int i = 0; i < number.length(); i++) // check if everything's an integer
 	{
 		if (number[i] >= '0' && number[i] <= '9')
 			continue;
@@ -68,16 +68,16 @@ bool isInteger(std::string number)
 bool isRealNumber(std::string number)
 {
 	bool firstDecimalCheck = false;
-	for (int i = 0; i < number.length(); i++) // check if the numbers left of the decimal are integers
+	for (int i = 0; i < number.length(); i++)
 	{
-		if (number[i] == '.')
+		if (number[i] == '.') // find the first decimal and keep note of it, move to next integer
 		{
 			firstDecimalCheck = true;
 			continue;
-		} else if (number[i] == '.' && firstDecimalCheck) 
+		} else if (number[i] == '.' && firstDecimalCheck) // Check if there's two decimals
 			return false;
 
-		if (number[i] >= '0' && number[i] <= '9')
+		if (number[i] >= '0' && number[i] <= '9') // make sure everything is a number
 			continue;
 		else return false;
 	}
@@ -169,7 +169,6 @@ int main()
 			{
 				outputf << "SEPERATOR" << '\t' << '=' << '\t' << entity << std::endl;
 			}
-			//inputf.unget(); // move pointer backwards for next iteration, it's going to end up skipping a letter if this isn't done.
 			word.clear(); // clear word
 			wordFormulation = false;
 			inputf >> std::skipws; // re-enable whitespace skipping for next iteration
