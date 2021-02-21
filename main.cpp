@@ -16,12 +16,22 @@ void ignoreComment(char character, std::ifstream &inputf)
 
 bool isOperator(char character)
 {
-	return false;
+	char operators[100] = { '+', '-', '*', '/','%', '>', '<','=' };
+	for (int i = 0; i < 10; i++) {
+        if (character == operators[i])
+        return true;
+    }
+    return false;
 }
 
 bool isSeperator(char character)
 {
-	return false;
+	char separators[30] = { ';',',',':','(',')','{','}','[',']' };
+	for (int j = 0; j < 10; ++j) {
+		if (character == separators[j])
+		return true;
+    }
+    return false;
 }
 
 bool isIdentifier(std::string str)
