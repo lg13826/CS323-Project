@@ -56,17 +56,19 @@ bool isIdentifier(std::string str)
 
 bool isKeyword(std::string str)
 {
+	//vector to hold library of strings
 	std::vector <std::string> library {"int" ,"float", "bool", "true", "False",
 																"if", "else", "then", "endif", "endelse",
 															  "while", "whileend", "do", "enddo", "for",
 															  "endfor", "STDinput", "STDoutput", "and",
 															   "or", "not"};
+	//iterate through library, and compare strings, if the same return true
 	for(int i = 0; i< library.size()-1; i++){
 		if( str.compare(library[i]) == 0){
 			return true;
 		}
 	}
-
+// if no string is the same as library, return false
 	return false;
 }
 
@@ -109,7 +111,6 @@ int main()
 			wordFormulation = true;
 			word.push_back(entity);
 			inputf >> std::noskipws >> entity;
-			std::cout << entity;
 		} while (!isOperator(entity) && !isSeperator(entity) && entity != ' ' && entity != '\n' && inputf.eof() == false); // keep looping until a seperator, operator or whitespace is encountered....
 
 		if(wordFormulation == true)
