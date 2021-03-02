@@ -105,16 +105,21 @@ bool isKeyword(std::string str)
 int main()
 {
 	char entity;
-	std::ifstream inputf("input.txt");
+
+	std::string filetoread;
+	std::ifstream inputf;
+
+	// basic user interface
+	do { 
+		std::cout << std::string(50, '\n');
+		std::cout << "Input File Name (EX: input.txt): ";
+		getline(std::cin, filetoread);
+		inputf.open(filetoread); // open file of name
+	} while (inputf.fail()); // loop if file name doesn't exist
+	// basic user interface
+	
 	std::ofstream outputf("output.txt");
 	outputf << "TOKENS" << '\t' << '\t' << "Lexemes" << std::endl << std::endl;
-
-	if (inputf.fail()) // error check, no input file detected and new one is created.
-	{
-		inputf.close();
-		std::ofstream inputf("input.txt");
-		return 1;
-	}
 
 	std::vector<char> word; // this will push characters into a vector for when word is being processed...
 	bool wordFormulation = false; // this will be a sentry value to check if word formulation is being done, default false.
