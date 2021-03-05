@@ -1,3 +1,6 @@
+//Group Members: Kim Eaton, Luciano Gibertoni, Eduardo Rayo, Yanessa Vazquez
+//Assigment 1
+
 #include <iostream>
 #include <fstream>
 #include <string>
