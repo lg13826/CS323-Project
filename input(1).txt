@@ -1,10 +1,6 @@
-! Find the largest value between two numbers !
-int num1, num2$, large_num ;
-if(num1 > num2$)
-{
-	large_num = num1;
-}
-else
-{
-	large_num = num2$;
-}
+! this is comment for this sample test code for the assignment operator, the ; is optional!
+
+x=a + b;
+z=c+ d;
+a=e-f;
+b=g*n;

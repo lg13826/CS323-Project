@@ -1,4 +1,4 @@
-//Group Members: Kim Eaton, Luciano Gibertoni, Eduardo Rayo, Yanessa Vazquez
+//Group Members: Kim Eaton, Luciano Gibertoni, Yanessa Vazquez
 //Assigment 1
 
 #include <iostream>
@@ -122,7 +122,7 @@ int main()
 	// basic user interface
 	
 	std::ofstream outputf("output.txt");
-	outputf << "TOKENS" << '\t' << '\t' << "Lexemes" << std::endl << std::endl;
+	outputf << "Group Members: Kim Eaton, Luciano Gibertoni, Yanessa Vazquez" << std::endl << std::endl;
 
 	std::vector<char> word; // this will push characters into a vector for when word is being processed...
 	bool wordFormulation = false; // this will be a sentry value to check if word formulation is being done, default false.
@@ -135,13 +135,15 @@ int main()
 			ignoreComment(entity, inputf);
 			continue;
 		}
+		
+		outputf << "Token: ";
 		if (isOperator(entity))
 		{
-			outputf << "OPERATOR" << '\t' << '=' << '\t' << entity << std::endl;
+			outputf << "OPERATOR" << '\t' << '\t' << "LEXEME: " << '\t' << entity << std::endl;
 		}
 		else if (isSeperator(entity))
 		{
-			outputf << "SEPERATOR" << '\t' << '=' << '\t' << entity << std::endl;
+			outputf << "SEPERATOR" << '\t' << "LEXEME: " << '\t' << entity << std::endl;
 		}
 		else do //most likely a word or number, start building the word using characters
 		{
@@ -155,27 +157,29 @@ int main()
 			std::string wordString(word.begin(), word.end()); //convert character vector to string for reading in functions
 			if (isInteger(wordString))
 			{
-				outputf << "INTEGER" << '\t' << '=' << '\t' << wordString << std::endl;
+				outputf << "INTEGER" << '\t' << "LEXEME: " << '\t' << wordString << std::endl;
 			}
 			else if (isRealNumber(wordString))
 			{
-				outputf << "REAL" << '\t' << '=' << '\t' << wordString << std::endl;
+				outputf << "REAL" << '\t' << "LEXEME: " << '\t' << wordString << std::endl;
 			}
 			else if (isKeyword(wordString))
 			{
-				outputf << "KEYWORD" << '\t' << '=' << '\t' << wordString << std::endl;
+				outputf << "KEYWORD" << '\t' << "LEXEME: " << '\t' << wordString << std::endl;
 			}
 			else if (isIdentifier(wordString))
 			{
-				outputf << "IDENTIFIER" << '\t' << '=' << '\t' << wordString << std::endl;
+				outputf << "IDENTIFIER" << '\t' << "LEXEME: " << '\t' << wordString << std::endl;
 			}
 			if (isOperator(entity))
 			{
-				outputf << "OPERATOR" << '\t' << '=' << '\t' << entity << std::endl;
+				outputf << "Token: ";
+				outputf << "OPERATOR" << '\t' << '\t' << "LEXEME: " << '\t' << entity << std::endl;
 			}
 			else if (isSeperator(entity))
 			{
-				outputf << "SEPERATOR" << '\t' << '=' << '\t' << entity << std::endl;
+				outputf << "Token: ";
+				outputf << "SEPERATOR" << '\t' << "LEXEME: " << '\t' << entity << std::endl;
 			}
 			word.clear(); // clear word
 			wordFormulation = false;
