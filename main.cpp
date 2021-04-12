@@ -6,6 +6,8 @@
 #include <string>
 #include <locale>
 #include <vector>
+#include <stack>
+#include <map>
 
 //include additional function files here
 
@@ -105,12 +107,35 @@ bool isKeyword(std::string str)
 	return false;
 }
 
+void stackParser(std::map<char, char> tableFunctionParameter, std::stack<char> stackFunctionParameter)
+{
+	while (stackFunctionParameter.empty() != true)
+		char x = stackFunctionParameter.top(); // this one access's the first entity in the stack (the top one)
+		char a; // incoming token
+	// the top command accesses next element in stack
+	if (X IS IN T) 
+	{
+		if (x == a)
+		{
+			stackFunctionParameter.pop();
+		} else return;
+	}
+	else 
+	{
+		tableFunctionParameter.insert(x, a);
+		stackFunctionParameter.pop();
+		stackFunctionParameter.emplace
+	}
+}
+
 int main()
 {
 	char entity;
 
 	std::string filetoread;
 	std::ifstream inputf;
+	std::stack<char> stackProgram;  
+	std::map<char, char> tableMap; // Table that Stack pushes into
 
 	// basic user interface
 	do { 
@@ -130,12 +155,21 @@ int main()
 	while (inputf.eof() == false) // go through input.txt and read each word.
 	{
 		inputf >> entity;
+		stackProgram.push('$');
+
 		if (entity == '!')
 		{
 			ignoreComment(entity, inputf);
 			continue;
 		}
-		
+		if (entity != '\n') 
+			stackProgram.push(entity);
+		else 
+		{
+			stackProgram.push('$');
+			stackParser(&tableMap, &stackProgram);
+		}
+
 		outputf << "Token: ";
 		if (isOperator(entity))
 		{
