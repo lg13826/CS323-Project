@@ -6,8 +6,6 @@
 #include <string>
 #include <locale>
 #include <vector>
-#include <stack>
-#include <map>
 
 //include additional function files here
 
@@ -107,42 +105,27 @@ bool isKeyword(std::string str)
 	return false;
 }
 
-void stackParser(std::map<char, char> tableFunctionParameter, std::stack<char> stackFunctionParameter)
+void syntax(std::string lineString)
 {
-	while (stackFunctionParameter.empty() != true)
-		char x = stackFunctionParameter.top(); // this one access's the first entity in the stack (the top one)
-		char a; // incoming token
-	// the top command accesses next element in stack
-	if (X IS IN T) 
-	{
-		if (x == a)
-		{
-			stackFunctionParameter.pop();
-		} else return;
-	}
-	else 
-	{
-		tableFunctionParameter.insert(x, a);
-		stackFunctionParameter.pop();
-		stackFunctionParameter.emplace
-	}
+	std::cout<<lineString<< std::endl;
 }
 
 int main()
 {
 	char entity;
+	std::string a_line;
+	a_line.clear(); //cleans string
 
 	std::string filetoread;
 	std::ifstream inputf;
-	std::stack<char> stackProgram;  
-	std::map<char, char> tableMap; // Table that Stack pushes into
+
 
 	// basic user interface
 	do { 
 		std::cout << std::string(50, '\n');
-		std::cout << "Input File Name (EX: input.txt): ";
-		getline(std::cin, filetoread);
-		inputf.open(filetoread); // open file of name
+		//std::cout << "Input File Name (EX: input.txt): "; Temporarily disabled for debugging
+		//getline(std::cin, filetoread);
+		inputf.open("input(1).txt"); // open file of name (Temporarily set to input(1).txt for debugging) 
 	} while (inputf.fail()); // loop if file name doesn't exist
 	// basic user interface
 	
@@ -155,28 +138,29 @@ int main()
 	while (inputf.eof() == false) // go through input.txt and read each word.
 	{
 		inputf >> entity;
-		stackProgram.push('$');
 
 		if (entity == '!')
 		{
 			ignoreComment(entity, inputf);
 			continue;
 		}
-		if (entity != '\n') 
-			stackProgram.push(entity);
-		else 
-		{
-			stackProgram.push('$');
-			stackParser(&tableMap, &stackProgram);
-		}
 
+		
 		outputf << "Token: ";
 		if (isOperator(entity))
 		{
+			a_line.push_back(entity);
 			outputf << "OPERATOR" << '\t' << '\t' << "LEXEME: " << '\t' << entity << std::endl;
 		}
 		else if (isSeperator(entity))
 		{
+			if (entity = ';')
+			{
+				syntax(a_line);
+				a_line.clear();
+			}
+			else
+				a_line.push_back(entity);
 			outputf << "SEPERATOR" << '\t' << "LEXEME: " << '\t' << entity << std::endl;
 		}
 		else do //most likely a word or number, start building the word using characters
@@ -189,6 +173,9 @@ int main()
 		if(wordFormulation == true)
 		{
 			std::string wordString(word.begin(), word.end()); //convert character vector to string for reading in functions
+
+			a_line.append(wordString);
+
 			if (isInteger(wordString))
 			{
 				outputf << "INTEGER" << '\t' << "LEXEME: " << '\t' << wordString << std::endl;
@@ -207,11 +194,18 @@ int main()
 			}
 			if (isOperator(entity))
 			{
+				a_line.push_back(entity);
 				outputf << "Token: ";
 				outputf << "OPERATOR" << '\t' << '\t' << "LEXEME: " << '\t' << entity << std::endl;
 			}
 			else if (isSeperator(entity))
 			{
+				if (entity = ';')
+				{
+					syntax(a_line);
+					a_line.clear();
+				} else
+					a_line.push_back(entity);
 				outputf << "Token: ";
 				outputf << "SEPERATOR" << '\t' << "LEXEME: " << '\t' << entity << std::endl;
 			}
