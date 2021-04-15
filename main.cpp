@@ -104,12 +104,97 @@ bool isKeyword(std::string str)
 // if no string is the same as library, return false
 	return false;
 }
+enum Symbols{
+	//non-terminal
+	TS_L_PARENS  // (
+	TS_R_PARENS // )
+	TS_ID // id
+	TS_PLUS // +
+	TS_STAR // *
+	TS_EOS // end of stack, $
+	TS_INVALID // invaled Token
+	//non terminal
+	NTF_E // E
+	NTF_EN // E'
+	NTF_T // T
+	NTF_TN // T'
+	NTF_F // F
+
+	)
+}
 
 void syntax(std::string lineString)
 {
 	std::cout<<lineString<< std::endl;
-}
+	stack<Symbols> ss; //symbol stack
+	map <Symbols, map<Symbols, int>> table; // table for rules
 
+	//initialize table
+	table[NTS_E][TS_ID]=1;
+	table[NTS_E][TS_L_PARENS]=1;
+	table[NTS_EN][TS_PLUS]=1;
+	table[NTS_EN][TS_R_PARENS]=2;
+	table[NTS_EN][TS_EOS]=2;
+	table[NTS_T][TS_ID] =3;
+	table[NTS_T][TS_L_PARENS] =3;
+	table[NTS_TN][TS_PLUS]=5;
+	table[NTS_TN][TS_STAR]=4;
+	table[NTS_TN][TS_R_PARENS]=4;
+	tabble[NTS_TN][TS_EOS]=4;
+	table[NTS_F][TS_ID]=6;
+	table[NTS_F][TS_L_PARENS]=7;
+
+
+	lineString+=$;// append EOL symbol($) to end of line
+
+
+	ss.push(TS_EOS);// initialize stack witb EOL
+	ss.push(NTF_S); // initialize stack with non terminal
+
+	int i = 0; // strng iterator
+
+	while (ss.size()>0){
+		if (lexer(lineString[i]) == ss.top()){
+			std::cout<<"Matched Symbols: " << lexer(lineString[i]) << std::endl;
+			i++;
+			ss.pop();
+		}else{
+			std::cout << "Rule" << table[ss.top()][lexer(lineString[i])];
+			switch (table[ss.top()][lexer(lineString[i])]){
+				case 1: // E-> TE'
+
+				case 2: //E' -> e
+
+				case 3: // T-FT'
+
+				case 4: // T->FT'
+
+				case 5: // T-> e
+
+				case 6: //F-> id
+
+				case 7: // F->(E)
+
+			}
+		}
+
+	}
+
+
+Symbols lexer(string a){
+	if(isIdentifier(a)){
+		return TS_ID;
+	}
+	switch(a) {
+	case "(": return TS_L_PARENS;
+	case ")": return TS_R_PARENS;
+	case "+": return TS_PLUS;
+	case "*": return TS_STAR;
+	case "$": return TS_EOS;
+	default: return TS_INVALID;
+
+}
+}
 int main()
 {
 	char entity;
@@ -121,14 +206,14 @@ int main()
 
 
 	// basic user interface
-	do { 
+	do {
 		std::cout << std::string(50, '\n');
 		//std::cout << "Input File Name (EX: input.txt): "; Temporarily disabled for debugging
 		//getline(std::cin, filetoread);
-		inputf.open("input(1).txt"); // open file of name (Temporarily set to input(1).txt for debugging) 
+		inputf.open("input(1).txt"); // open file of name (Temporarily set to input(1).txt for debugging)
 	} while (inputf.fail()); // loop if file name doesn't exist
 	// basic user interface
-	
+
 	std::ofstream outputf("output.txt");
 	outputf << "Group Members: Kim Eaton, Luciano Gibertoni, Yanessa Vazquez" << std::endl << std::endl;
 
@@ -145,7 +230,7 @@ int main()
 			continue;
 		}
 
-		
+
 		outputf << "Token: ";
 		if (isOperator(entity))
 		{
