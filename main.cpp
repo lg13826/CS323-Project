@@ -107,15 +107,15 @@ bool isKeyword(std::string str)
 	return false;
 }
 enum Symbols{
-	//non-terminal
+	//Terminal
 	TS_L_PARENS,  // (
 	TS_R_PARENS, // )
 	TS_ID, // id
 	TS_PLUS, // +
 	TS_STAR, // *
 	TS_EOS, // end of stack, $
-	TS_INVALID, // invaled Token
-	//non terminal
+	TS_INVALID, // invalid Token
+	//non-terminal
 	NTS_E, // E
 	NTS_EN, // E'
 	NTS_T, // T
@@ -148,7 +148,7 @@ void syntax(std::string lineString)
 {
 	std::cout<<lineString<< std::endl;
 	std::stack<Symbols> ss; //symbol stack
-	std::map<Symbols, std::map<Symbols, int> > table; // table for rules
+	int table[10][10]; // table for rules
 
 	std::cout << "NTS_E= " << NTS_E << std::endl;
 	std::cout << "NTS_EN= " << NTS_EN << std::endl;
