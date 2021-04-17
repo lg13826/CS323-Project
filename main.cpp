@@ -128,16 +128,18 @@ enum Symbols{
 Symbols lexer(char a){
 	std:: string b;
 	b.push_back(a);
-	if(isIdentifier(b)){
+	if(a!='$' && isIdentifier(b)){
 		return TS_ID;
 	}
 	switch(a) {
 	case '(': return TS_L_PARENS;
-	case ')': return TS_R_PARENS;
-	case '+': return TS_PLUS;
-	case '*': return TS_STAR;
-	case '$': return TS_EOS;
-	default: return TS_INVALID;
+	case ')':	return TS_R_PARENS;
+	case '+':	return TS_PLUS;
+	case '*':return TS_STAR;
+	case '$':	return TS_EOS;
+	default:
+		std::cout<< "found invalid for " << a << " in lexer" << std::endl;
+		return TS_INVALID;
 
 }
 }
@@ -148,10 +150,23 @@ void syntax(std::string lineString)
 	std::stack<Symbols> ss; //symbol stack
 	std::map<Symbols, std::map<Symbols, int> > table; // table for rules
 
+	std::cout << "NTS_E= " << NTS_E << std::endl;
+	std::cout << "NTS_EN= " << NTS_EN << std::endl;
+	std::cout << "NTS_T= " << NTS_T << std::endl;
+	std::cout << "NTS_TN= " << NTS_TN << std::endl;
+	std::cout << "NTS_F= " << NTS_F << std::endl;
+	std::cout << "TS_ID= " << TS_ID << std::endl;
+	std::cout << "TS_L_PARENS= " << TS_L_PARENS << std::endl;
+	std::cout << "TS_R_PARENS= " << TS_R_PARENS << std::endl;
+	std::cout << "TS_PLUS= " << TS_PLUS << std::endl;
+	std::cout << "TS_STAR= " << TS_STAR << std::endl;
+	std::cout << "TS_EOS= " << TS_EOS << std::endl;
+	std::cout <<"TS_INVALID= " << TS_INVALID << std::endl;
+
 	//initialize table
 	table[NTS_E][TS_ID] = 1;
 	table[NTS_E][TS_L_PARENS]=1;
-	table[NTS_EN][TS_PLUS]=1;
+	table[NTS_EN][TS_PLUS]=8;
 	table[NTS_EN][TS_R_PARENS]=2;
 	table[NTS_EN][TS_EOS]=2;
 	table[NTS_T][TS_ID] =3;
@@ -164,7 +179,7 @@ void syntax(std::string lineString)
 	table[NTS_F][TS_L_PARENS]=7;
 
 
-	lineString+='$';// append EOL symbol($) to end of line
+	lineString+="$";// append EOL symbol($) to end of line
 
 
 	ss.push(TS_EOS);// initialize stack witb EOL
@@ -172,15 +187,23 @@ void syntax(std::string lineString)
 
 	int i = 0; // strng iterator
 
-	while (ss.size()>0 && i<ss.size()-1){
+	while (ss.size()>0 && i<lineString.size()){
+		if(lineString[i] == ' ' || lineString[i] == '='){
+			i++;
+		}
 		if (lexer(lineString[i]) == ss.top()){
-			std::cout<<"Matched Symbols: " << lexer(lineString.at(i)) << std::endl;
+			std::cout<<"Matched Symbols: " << lexer(lineString[i]) << std::endl;
 			i++;
 			ss.pop();
 		}else{
-			std::cout << "Rule: " << table[ss.top()][lexer(lineString.at(i))];
-			switch (table[ss.top()][lexer(lineString.at(i))]){
-				case 1: // E-> TE
+			std::cout << "Switch table Starts: " << std::endl;
+			std::cout << "Stack: " << ss.top() << " String: " << lexer(lineString[i]) <<std::endl;
+			switch (table[ss.top()][lexer(lineString[i])]){
+				case 0:
+				std::cout<< "Somehow zero?" << std::endl;
+				ss.pop();
+				break;
+				case 1: // E-> TE'
 				std::cout<<"<Expression>--> <Term><Expression>"<< std::endl;
 				ss.pop();
 				ss.push(NTS_EN);
@@ -224,9 +247,20 @@ void syntax(std::string lineString)
 				ss.push(NTS_F);
 				ss.push(TS_L_PARENS);
 				break;
-				default: ss.pop();
+
+				case 8: // E'-->TE'
+				std::cout << "<ExpressionPrime>--><Term><ExpressionPrime" << std::endl;
+				ss.pop();
+				ss.push(NTS_EN);
+				ss.push(NTS_T);
+				break;
+
+				default: std::cout << "error in cases" << std::endl;
 			}
-		}
+
+	}
+
+
 
 	}
 }
