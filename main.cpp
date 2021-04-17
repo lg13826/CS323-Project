@@ -6,6 +6,8 @@
 #include <string>
 #include <locale>
 #include <vector>
+#include <map>
+#include <stack>
 
 //include additional function files here
 
@@ -106,31 +108,48 @@ bool isKeyword(std::string str)
 }
 enum Symbols{
 	//non-terminal
-	TS_L_PARENS  // (
-	TS_R_PARENS // )
-	TS_ID // id
-	TS_PLUS // +
-	TS_STAR // *
-	TS_EOS // end of stack, $
-	TS_INVALID // invaled Token
+	TS_L_PARENS,  // (
+	TS_R_PARENS, // )
+	TS_ID, // id
+	TS_PLUS, // +
+	TS_STAR, // *
+	TS_EOS, // end of stack, $
+	TS_INVALID, // invaled Token
 	//non terminal
-	NTF_E // E
-	NTF_EN // E'
-	NTF_T // T
-	NTF_TN // T'
-	NTF_F // F
+	NTS_E, // E
+	NTS_EN, // E'
+	NTS_T, // T
+	NTS_TN, // T'
+	NTS_F // F
 
-	)
+
+};
+
+Symbols lexer(char a){
+	std:: string b;
+	b.push_back(a);
+	if(isIdentifier(b)){
+		return TS_ID;
+	}
+	switch(a) {
+	case '(': return TS_L_PARENS;
+	case ')': return TS_R_PARENS;
+	case '+': return TS_PLUS;
+	case '*': return TS_STAR;
+	case '$': return TS_EOS;
+	default: return TS_INVALID;
+
+}
 }
 
 void syntax(std::string lineString)
 {
 	std::cout<<lineString<< std::endl;
-	stack<Symbols> ss; //symbol stack
-	map <Symbols, map<Symbols, int>> table; // table for rules
+	std::stack<Symbols> ss; //symbol stack
+	std::map<Symbols, std::map<Symbols, int> > table; // table for rules
 
 	//initialize table
-	table[NTS_E][TS_ID]=1;
+	table[NTS_E][TS_ID] = 1;
 	table[NTS_E][TS_L_PARENS]=1;
 	table[NTS_EN][TS_PLUS]=1;
 	table[NTS_EN][TS_R_PARENS]=2;
@@ -140,61 +159,79 @@ void syntax(std::string lineString)
 	table[NTS_TN][TS_PLUS]=5;
 	table[NTS_TN][TS_STAR]=4;
 	table[NTS_TN][TS_R_PARENS]=4;
-	tabble[NTS_TN][TS_EOS]=4;
+	table[NTS_TN][TS_EOS]=4;
 	table[NTS_F][TS_ID]=6;
 	table[NTS_F][TS_L_PARENS]=7;
 
 
-	lineString+=$;// append EOL symbol($) to end of line
+	lineString+='$';// append EOL symbol($) to end of line
 
 
 	ss.push(TS_EOS);// initialize stack witb EOL
-	ss.push(NTF_S); // initialize stack with non terminal
+	ss.push(NTS_E); // initialize stack with non terminal
 
 	int i = 0; // strng iterator
 
-	while (ss.size()>0){
+	while (ss.size()>0 && i<ss.size()-1){
 		if (lexer(lineString[i]) == ss.top()){
-			std::cout<<"Matched Symbols: " << lexer(lineString[i]) << std::endl;
+			std::cout<<"Matched Symbols: " << lexer(lineString.at(i)) << std::endl;
 			i++;
 			ss.pop();
 		}else{
-			std::cout << "Rule" << table[ss.top()][lexer(lineString[i])];
-			switch (table[ss.top()][lexer(lineString[i])]){
-				case 1: // E-> TE'
+			std::cout << "Rule: " << table[ss.top()][lexer(lineString.at(i))];
+			switch (table[ss.top()][lexer(lineString.at(i))]){
+				case 1: // E-> TE
+				std::cout<<"<Expression>--> <Term><Expression>"<< std::endl;
+				ss.pop();
+				ss.push(NTS_EN);
+				ss.push(NTS_T);
+				break;
 
 				case 2: //E' -> e
+				std::cout<<"<ExpressionPrime>--> <Epsilon>"<< std::endl;
+				ss.pop();
+				break;
 
-				case 3: // T-FT'
+				case 3: // T>-FT'
+				std::cout<<"<Term>--><Factor><TermPrime>"<< std::endl;
+				ss.pop();
+				ss.push(NTS_TN);
+				ss.push(NTS_F);
+				break;
 
 				case 4: // T->FT'
+				std::cout<<"<Term>--><Factor><TermPrime>"<< std::endl;
+				ss.pop();
+				ss.push(NTS_TN);
+				ss.push(NTS_F);
+				break;
 
 				case 5: // T-> e
+				std::cout<<"<Term>--><Epsilon>"<< std::endl;
+				ss.pop();
+				break;
 
 				case 6: //F-> id
+				std::cout<<"<Factor>--><ID>"<< std::endl;
+				ss.pop();
+				ss.push(TS_ID);
+				break;
 
 				case 7: // F->(E)
-
+				std::cout<<"<Factor>--><(Expression)>"<< std::endl;
+				ss.pop();
+				ss.push(TS_R_PARENS);
+				ss.push(NTS_F);
+				ss.push(TS_L_PARENS);
+				break;
+				default: ss.pop();
 			}
 		}
 
 	}
-
-
-Symbols lexer(string a){
-	if(isIdentifier(a)){
-		return TS_ID;
-	}
-	switch(a) {
-	case "(": return TS_L_PARENS;
-	case ")": return TS_R_PARENS;
-	case "+": return TS_PLUS;
-	case "*": return TS_STAR;
-	case "$": return TS_EOS;
-	default: return TS_INVALID;
-
 }
-}
+
+
 int main()
 {
 	char entity;
