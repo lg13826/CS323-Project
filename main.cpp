@@ -150,9 +150,12 @@ Symbols lexer(char a){
 
 void syntax(std::string lineString)
 {
+	if (lineString.size() == 0)
+		return;
+
 	std::cout<<lineString<< std::endl;
 	std::stack<Symbols> ss; //symbol stack
-	int table[12][10]; // table for rules
+	int table[15][15]; // table for rules
 	std::string line;
 	for(int f = 0; f < lineString.size(); f++){
 		if(lineString[f] != ' ' || lineString[f] != '='){
@@ -213,6 +216,7 @@ void syntax(std::string lineString)
 				std::cout<<"Matched Symbols: " << lexer(line[i]) << ", " << line[i] << std::endl;
 				if(ss.top() == TS_EOS && lexer(line[i])== TS_EOS){
 					//maybe return true
+					std::cout << "Line Done";
 					std::cout << "SS and LINE == TS_EOS" << std::endl;
 					break;
 				}
