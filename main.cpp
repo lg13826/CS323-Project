@@ -210,6 +210,7 @@ void syntax(std::string lineString)
 				std::cout<<"Matched Symbols: " << lexer(line[i]) << ", " << line[i] << std::endl;
 				if(ss.top() == TS_EOS && lexer(line[i])== TS_EOS){
 					//maybe return true
+					std::cout << "LINE DONE" << std::endl;
 					std::cout << "SS and LINE == TS_EOS" << std::endl;
 					break;
 				}
