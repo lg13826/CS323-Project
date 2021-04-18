@@ -181,7 +181,7 @@ void syntax(std::string lineString)
 	for(int f = 0; f < lineString.size(); f++){
 		constructedWord.push_back(lineString[f]);
 
-		if( isOperator(lineString[f]) )
+		if( isOperator(lineString[f]) || lineString[f] == ' ')
 		{
 			std::cout << constructedWord << std::endl;
 			line.push_back(constructedWord);
@@ -477,8 +477,8 @@ int main()
 		if(wordFormulation == true)
 		{
 			std::string wordString(word.begin(), word.end()); //convert character vector to string for reading in functions
-
 			a_line.append(wordString);
+			a_line.push_back(' ');
 
 			if (isInteger(wordString))
 			{
