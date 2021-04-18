@@ -201,27 +201,32 @@ void syntax(std::string lineString)
 
 	int i = 0; // strng iterator
 
-	while (ss.size()>0 && i<line.size()){
- 	std::cout << line << std::endl;
-	if(line[i] == '='){
-		i++;
-	}
-	if(lexer(line[i]) == TS_EOS){
-		while(ss.top() != TS_EOS){
-			ss.pop();
+	while (!ss.empty() && i<line.size()){
+		if(line[i] == '='){
+			i++;
 		}
-	}
+
 		if(ss.top() == TS_ID || ss.top() == TS_MINUS || ss.top() == TS_PLUS || ss.top() == TS_STAR || ss.top() == TS_DIV ||
 				ss.top() == TS_R_PARENS || ss.top() == TS_L_PARENS || ss.top() == TS_EOS){
 
 			if (lexer(line[i]) == ss.top()){
-				std::cout<<"Matched Symbols: " << lexer(line[i]) << std::endl;
+				std::cout<<"Matched Symbols: " << lexer(line[i]) << ", " << line[i] << std::endl;
+				if(ss.top() == TS_EOS && lexer(line[i])== TS_EOS){
+					//maybe return true
+					std::cout << "SS and LINE == TS_EOS" << std::endl;
+					break;
+				}
 				i++;
-				ss.pop();
+				if(!ss.empty()){
+					ss.pop();
+				}
+				std::cout << ss.size() << std::endl;
 				}else{
-					std::cout<< "ERROR Line input does not equal Stack" << std::endl;
+					std::cout<< "SYNTAX ERROR" << std::endl;
+					//maybe return false
 				}
 		}else{
+
 				std::cout << "Switch table Starts: " << std::endl;
 				std::cout << "Stack: " << ss.top() << " String: " << lexer(line[i]) << ", " << line[i] <<std::endl;
 
@@ -299,13 +304,11 @@ void syntax(std::string lineString)
 						default: std::cout << "error in cases" << std::endl;
 				}
 			}else{
-				std::cout << "ERROR: Probably 0 input" << std::endl;
+				std::cout << "Syntax ERROR" << std::endl;
 				break;
 			}
 
 	}
-
-
 
 	}
 	return;
