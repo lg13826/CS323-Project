@@ -160,12 +160,39 @@ void syntax(std::string lineString)
 	std::cout<<lineString<< std::endl;
 	std::stack<Symbols> ss; //symbol stack
 	int table[20][20]; // table for rules
-	std::string line;
+	std::vector<std::string> line; 
+	
+	bool nextWord = false;
+	std::string constructedWord;
+	constructedWord.clear(); // initialized
+
 	for(int f = 0; f < lineString.size(); f++){
-		if(lineString[f] != ' '){
-			line+= lineString[f];
+		constructedWord.push_back(lineString[f]);
+
+		if( isOperator(lineString[f]) )
+		{
+			std::cout << constructedWord << std::endl;
+			line.push_back(constructedWord);
+			constructedWord.clear();
+			nextWord = true;
+			continue;
+		}
+
+		if( isOperator(lineString[f+1]) )
+		{
+			line.push_back(constructedWord);
+			nextWord = true;
+		}
+		
+		if (nextWord == true)
+		{
+			std::cout << constructedWord << std::endl;
+			constructedWord.clear();
+			nextWord = false;
+			continue;
 		}
 	}
+
 
 	//initialize table
 	table[NTS_E][TS_ID] = 1;
@@ -188,15 +215,22 @@ void syntax(std::string lineString)
 	table[NTS_A][TS_ID]=12;
 
 
-	line+="$";// append EOL symbol($) to end of line
+	line.push_back("$");
+	//line+="$";// append EOL symbol($) to end of line
 	ss.push(TS_EOS);
-	for (int j=0;j<line.length();j++){
-		if(line[j]== '='){
-			ss.push(NTS_S);
-		}else{
-			ss.push(NTS_E);
+	bool s = false;
+	for (int j=0;j<line.size();j++){
+		if(line[j] == "="){
+			s = true;
+			break;
 		}
 	}
+
+	if (s == true)
+		ss.push(NTS_S);
+	else 
+		ss.push(NTS_E);
+
 
 
 	int i = 0; // strng iterator
@@ -300,7 +334,7 @@ void syntax(std::string lineString)
 						break;
 
 						case 11: //S-->A
-						std::cout << "<STATEMENT>--><ASSIGNMENT" << std::endl;
+						std::cout << "<STATEMENT>--><ASSIGNMENT>" << std::endl;
 						ss.pop();
 						ss.push(NTS_A);
 						break;
@@ -311,6 +345,8 @@ void syntax(std::string lineString)
 						ss.push(NTS_E);
 						ss.push(TS_EQUAL);
 						ss.push(TS_ID);
+						break;
+
 						default: std::cout << "error in cases" << std::endl;
 				}
 			}else{
