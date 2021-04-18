@@ -108,19 +108,21 @@ bool isKeyword(std::string str)
 }
 enum Symbols{
 	//Terminal
-	TS_L_PARENS,  // (
-	TS_R_PARENS, // )
-	TS_ID, // id
-	TS_PLUS, // +
-	TS_STAR, // *
-	TS_EOS, // end of stack, $
-	TS_INVALID, // invalid Token
+	TS_L_PARENS,  // ( 0
+	TS_R_PARENS, // ) 1
+	TS_ID, // id 2
+	TS_PLUS, // + 3
+	TS_STAR, // * 4
+	TS_EOS, // end of stack, $ 5
+	TS_MINUS, // -  6
+	TS_DIV, // /  7
+	TS_INVALID, // invalid Token 8
 	//non-terminal
-	NTS_E, // E
-	NTS_EN, // E'
-	NTS_T, // T
-	NTS_TN, // T'
-	NTS_F // F
+	NTS_E, // E  9
+	NTS_Q, // Q  10
+	NTS_T, // T  11
+	NTS_R, // R  12
+	NTS_F // F  13
 
 
 };
@@ -136,6 +138,8 @@ Symbols lexer(char a){
 	case ')':	return TS_R_PARENS;
 	case '+':	return TS_PLUS;
 	case '*':return TS_STAR;
+	case '/':return TS_DIV;
+	case '-':return TS_MINUS;
 	case '$':	return TS_EOS;
 	default:
 		std::cout<< "found invalid for " << a << " in lexer" << std::endl;
@@ -148,12 +152,19 @@ void syntax(std::string lineString)
 {
 	std::cout<<lineString<< std::endl;
 	std::stack<Symbols> ss; //symbol stack
-	int table[10][10]; // table for rules
+	int table[12][10]; // table for rules
+	std::string line;
+	for(int f = 0; f < lineString.size(); f++){
+		if(lineString[f] != ' ' || lineString[f] != '='){
+			line+= lineString[f];
+		}
+	}
+
 
 	std::cout << "NTS_E= " << NTS_E << std::endl;
-	std::cout << "NTS_EN= " << NTS_EN << std::endl;
+	std::cout << "NTS_EN= " << NTS_Q << std::endl;
 	std::cout << "NTS_T= " << NTS_T << std::endl;
-	std::cout << "NTS_TN= " << NTS_TN << std::endl;
+	std::cout << "NTS_TN= " << NTS_R << std::endl;
 	std::cout << "NTS_F= " << NTS_F << std::endl;
 	std::cout << "TS_ID= " << TS_ID << std::endl;
 	std::cout << "TS_L_PARENS= " << TS_L_PARENS << std::endl;
@@ -166,20 +177,23 @@ void syntax(std::string lineString)
 	//initialize table
 	table[NTS_E][TS_ID] = 1;
 	table[NTS_E][TS_L_PARENS]=1;
-	table[NTS_EN][TS_PLUS]=8;
-	table[NTS_EN][TS_R_PARENS]=2;
-	table[NTS_EN][TS_EOS]=2;
-	table[NTS_T][TS_ID] =3;
-	table[NTS_T][TS_L_PARENS] =3;
-	table[NTS_TN][TS_PLUS]=5;
-	table[NTS_TN][TS_STAR]=4;
-	table[NTS_TN][TS_R_PARENS]=4;
-	table[NTS_TN][TS_EOS]=4;
-	table[NTS_F][TS_ID]=6;
-	table[NTS_F][TS_L_PARENS]=7;
+	table[NTS_Q][TS_PLUS]=2;
+	table[NTS_Q][TS_MINUS]=3;
+	table[NTS_Q][TS_R_PARENS]=4;
+	table[NTS_Q][TS_EOS]=4;
+	table[NTS_T][TS_ID] =5;
+	table[NTS_T][TS_L_PARENS] =5;
+	table[NTS_R][TS_PLUS]=6;
+	table[NTS_R][TS_MINUS]=6;
+	table[NTS_R][TS_STAR]=7;
+	table[NTS_R][TS_DIV]=8;
+	table[NTS_R][TS_R_PARENS]=6;
+	table[NTS_R][TS_EOS]=6;
+	table[NTS_F][TS_ID]=9;
+	table[NTS_F][TS_L_PARENS]=10;
 
 
-	lineString+="$";// append EOL symbol($) to end of line
+	line+="$";// append EOL symbol($) to end of line
 
 
 	ss.push(TS_EOS);// initialize stack witb EOL
@@ -187,75 +201,106 @@ void syntax(std::string lineString)
 
 	int i = 0; // strng iterator
 
-	while (ss.size()>0 && i<lineString.size()){
-		if(lineString[i] == ' ' || lineString[i] == '='){
-			i++;
-		}
-		if (lexer(lineString[i]) == ss.top()){
-			std::cout<<"Matched Symbols: " << lexer(lineString[i]) << std::endl;
-			i++;
+	while (ss.size()>0 && i<line.size()){
+ 	std::cout << line << std::endl;
+	if(line[i] == '='){
+		i++;
+	}
+	if(lexer(line[i]) == TS_EOS){
+		while(ss.top() != TS_EOS){
 			ss.pop();
+		}
+	}
+		if(ss.top() == TS_ID || ss.top() == TS_MINUS || ss.top() == TS_PLUS || ss.top() == TS_STAR || ss.top() == TS_DIV ||
+				ss.top() == TS_R_PARENS || ss.top() == TS_L_PARENS || ss.top() == TS_EOS){
+
+			if (lexer(line[i]) == ss.top()){
+				std::cout<<"Matched Symbols: " << lexer(line[i]) << std::endl;
+				i++;
+				ss.pop();
+				}else{
+					std::cout<< "ERROR Line input does not equal Stack" << std::endl;
+				}
 		}else{
-			std::cout << "Switch table Starts: " << std::endl;
-			std::cout << "Stack: " << ss.top() << " String: " << lexer(lineString[i]) <<std::endl;
-			switch (table[ss.top()][lexer(lineString[i])]){
-				case 0:
-				std::cout<< "Somehow zero?" << std::endl;
-				ss.pop();
-				break;
-				case 1: // E-> TE'
-				std::cout<<"<Expression>--> <Term><Expression>"<< std::endl;
-				ss.pop();
-				ss.push(NTS_EN);
-				ss.push(NTS_T);
-				break;
+				std::cout << "Switch table Starts: " << std::endl;
+				std::cout << "Stack: " << ss.top() << " String: " << lexer(line[i]) << ", " << line[i] <<std::endl;
 
-				case 2: //E' -> e
-				std::cout<<"<ExpressionPrime>--> <Epsilon>"<< std::endl;
-				ss.pop();
-				break;
+				if(table[ss.top()][lexer(line[i])] != 0){   // check table position is not blank
+					switch (table[ss.top()][lexer(line[i])]){  // check table position in cases
+						case 1: // E-> TQ
+						std::cout<<"<Expression>--> <Term><Expression>"<< std::endl;
+						ss.pop();
+						ss.push(NTS_Q);
+						ss.push(NTS_T);
+						break;
 
-				case 3: // T>-FT'
-				std::cout<<"<Term>--><Factor><TermPrime>"<< std::endl;
-				ss.pop();
-				ss.push(NTS_TN);
-				ss.push(NTS_F);
-				break;
+						case 2: //Q -> +TQ
+						std::cout<<"<ExpressionPrime>--> <PLUS><TERM><Q>"<< std::endl;
+						ss.pop();
+						ss.push(NTS_Q);
+						ss.push(NTS_T);
+						ss.push(TS_PLUS);
+						break;
 
-				case 4: // T->FT'
-				std::cout<<"<Term>--><Factor><TermPrime>"<< std::endl;
-				ss.pop();
-				ss.push(NTS_TN);
-				ss.push(NTS_F);
-				break;
+						case 3: // Q-->-TQ
+						std::cout<<"<Term>--><MINUS><TERM><Q>"<< std::endl;
+						ss.pop();
+						ss.push(NTS_Q);
+						ss.push(NTS_T);
+						ss.push(TS_MINUS);
+						break;
 
-				case 5: // T-> e
-				std::cout<<"<Term>--><Epsilon>"<< std::endl;
-				ss.pop();
-				break;
+						case 4: // T-> e
+						std::cout<<"<Term>--><EPSILON>"<< std::endl;
+						ss.pop();
+						break;
 
-				case 6: //F-> id
-				std::cout<<"<Factor>--><ID>"<< std::endl;
-				ss.pop();
-				ss.push(TS_ID);
-				break;
+						case 5: // T-> FR
+						std::cout<<"<Term>--><F><R>"<< std::endl;
+						ss.pop();
+						ss.push(NTS_R);
+						ss.push(NTS_F);
+						break;
 
-				case 7: // F->(E)
-				std::cout<<"<Factor>--><(Expression)>"<< std::endl;
-				ss.pop();
-				ss.push(TS_R_PARENS);
-				ss.push(NTS_F);
-				ss.push(TS_L_PARENS);
-				break;
+						case 6: //R--> e
+						std::cout<<"<R>--><EPSILON>"<< std::endl;
+						ss.pop();
+						break;
 
-				case 8: // E'-->TE'
-				std::cout << "<ExpressionPrime>--><Term><ExpressionPrime" << std::endl;
-				ss.pop();
-				ss.push(NTS_EN);
-				ss.push(NTS_T);
-				break;
+						case 7: // R--*FR
+						std::cout<<"<R>--><MULTIPLY><F><R>"<< std::endl;
+						ss.pop();
+						ss.push(NTS_R);
+						ss.push(NTS_F);
+						ss.push(TS_STAR);
+						break;
 
-				default: std::cout << "error in cases" << std::endl;
+						case 8: // R --> /FR
+						std::cout << "<R>--><DIV><F><R>" << std::endl;
+						ss.pop();
+						ss.push(NTS_R);
+						ss.push(NTS_F);
+						ss.push(TS_DIV);
+						break;
+
+						case 9: // F--> id
+						std::cout << "<F>--><id>" << std::endl;
+						ss.pop();
+						ss.push(TS_ID);
+						break;
+
+						case 10: // F--> (E)
+						std::cout << "<F>---> <id>" << std::endl;
+						ss.push(TS_R_PARENS);
+						ss.push(NTS_E);
+						ss.push(TS_L_PARENS);
+						break;
+
+						default: std::cout << "error in cases" << std::endl;
+				}
+			}else{
+				std::cout << "ERROR: Probably 0 input" << std::endl;
+				break;
 			}
 
 	}
@@ -263,6 +308,7 @@ void syntax(std::string lineString)
 
 
 	}
+	return;
 }
 
 
