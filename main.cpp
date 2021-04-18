@@ -130,22 +130,39 @@ enum Symbols{
 	NTS_S, // S  18
 	NTS_A, // A   19
 	NTS_D, // D 20
-	NTS_TYPE // TYPE 21
+	NTS_TYPE, // TYPE 21
+	NTS_ID // ID 22
 
 
 };
 
 Symbols lexer(std::string a){
-	char b = a[0];
-	if(a!="$" && isIdentifier(a)){
-		return TS_ID;
-	}else if(a!="$" && isKeyword(a)){
-		switch(b){
-		case 'b': return TS_BOOL;
-		case 'i': return TS_INT;
-		case 'f': return TS_FLOAT;
+
+	std:: string c;
+	for(int i = 0; i<a.length(); i++){
+		if(a[i]!= ' '){
+			c+=a[i];
+		}
 	}
+	if(a.length()>1){
+		if (isKeyword(c)){
+			if(a[0] == 'i'){
+				return TS_INT;
+			}else if(a[0]== 'b'){
+				return TS_BOOL;
+			}else if(a[0] == 'f'){
+				return TS_FLOAT;
+			}else{
+				return TS_INVALID;
+			}
+		}
+
+	}
+	char b = c[0];
+	if(b!= '$' && isIdentifier(c)){
+	return TS_ID;
 }
+
 		switch(b) {
 		case '(': return TS_L_PARENS;
 		case ')':	return TS_R_PARENS;
@@ -233,6 +250,7 @@ void syntax(std::string lineString)
 	table[NTS_TYPE][TS_INT]=15;
 	table[NTS_TYPE][TS_FLOAT]=16;
 	table[NTS_TYPE][TS_BOOL]=17;
+	table[NTS_ID][TS_ID]=18;
 
 
 
@@ -257,7 +275,9 @@ void syntax(std::string lineString)
 	std::vector<std::string >:: const_iterator i = line.begin(); // strng iterator
 
 	while (!ss.empty() && i!=line.end()){
-
+		while(*i == " "){
+			i++;
+		}
 		if(ss.top() == TS_ID || ss.top() == TS_MINUS || ss.top() == TS_PLUS || ss.top() == TS_STAR || ss.top() == TS_DIV ||
 				ss.top() == TS_R_PARENS || ss.top() == TS_L_PARENS || ss.top() == TS_EOS || ss.top() == TS_EQUAL || ss.top()==TS_FLOAT ||
 			ss.top()==TS_INT || ss.top()==TS_BOOL){
@@ -276,6 +296,7 @@ void syntax(std::string lineString)
 				std::cout << ss.size() << std::endl;
 				}else{
 					std::cout<< "SYNTAX ERROR" << std::endl;
+					return;
 					//maybe return false
 				}
 		}else{
@@ -378,11 +399,12 @@ void syntax(std::string lineString)
 						case 14: // D-->NTS_TYPE
 						std::cout << "<DECLARATIVE>--><TYPE" << std::endl;
 						ss.pop();
+						ss.push(NTS_ID);
 						ss.push(NTS_TYPE);
 						break;
 
 						case 15: //TYPE-->BOOL
-						std::cout << "<TYPE>--<bool>" << std::endl;
+						std::cout << "<TYPE>--<bool" << std::endl;
 						ss.pop();
 						ss.push(TS_BOOL);
 						break;
@@ -399,12 +421,20 @@ void syntax(std::string lineString)
 						ss.push(TS_INT);
 						break;
 
+						ss.push(TS_INT);
+						break;
+						case 18: // ID->id
+							ss.pop();
+							ss.push(TS_ID);
+							break;
+
 
 						default: std::cout << "error in cases" << std::endl;
 				}
 			}else{
 				std::cout << "Syntax ERROR" << std::endl;
-				break;
+				return;
+
 			}
 
 	}
