@@ -186,7 +186,6 @@ void syntax(std::string lineString)
 			std::cout << constructedWord << std::endl;
 			line.push_back(constructedWord);
 			constructedWord.clear();
-			nextWord = true;
 			continue;
 		}
 
