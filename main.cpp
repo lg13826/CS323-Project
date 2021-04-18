@@ -117,12 +117,15 @@ enum Symbols{
 	TS_MINUS, // -  6
 	TS_DIV, // /  7
 	TS_INVALID, // invalid Token 8
+	TS_EQUAL, // = 9
 	//non-terminal
-	NTS_E, // E  9
-	NTS_Q, // Q  10
-	NTS_T, // T  11
-	NTS_R, // R  12
-	NTS_F // F  13
+	NTS_E, // E  10
+	NTS_Q, // Q  11
+	NTS_T, // T  12
+	NTS_R, // R  13
+	NTS_F, // F  14
+	NTS_S, // S  15
+	NTS_A // A   16
 
 
 };
@@ -141,6 +144,7 @@ Symbols lexer(char a){
 	case '/':return TS_DIV;
 	case '-':return TS_MINUS;
 	case '$':	return TS_EOS;
+	case '=': return TS_EQUAL;
 	default:
 		std::cout<< "found invalid for " << a << " in lexer" << std::endl;
 		return TS_INVALID;
@@ -150,29 +154,18 @@ Symbols lexer(char a){
 
 void syntax(std::string lineString)
 {
+	if(lineString.size() == 0){
+		return;
+	}
 	std::cout<<lineString<< std::endl;
 	std::stack<Symbols> ss; //symbol stack
-	int table[12][10]; // table for rules
+	int table[20][20]; // table for rules
 	std::string line;
 	for(int f = 0; f < lineString.size(); f++){
-		if(lineString[f] != ' ' || lineString[f] != '='){
+		if(lineString[f] != ' '){
 			line+= lineString[f];
 		}
 	}
-
-
-	std::cout << "NTS_E= " << NTS_E << std::endl;
-	std::cout << "NTS_EN= " << NTS_Q << std::endl;
-	std::cout << "NTS_T= " << NTS_T << std::endl;
-	std::cout << "NTS_TN= " << NTS_R << std::endl;
-	std::cout << "NTS_F= " << NTS_F << std::endl;
-	std::cout << "TS_ID= " << TS_ID << std::endl;
-	std::cout << "TS_L_PARENS= " << TS_L_PARENS << std::endl;
-	std::cout << "TS_R_PARENS= " << TS_R_PARENS << std::endl;
-	std::cout << "TS_PLUS= " << TS_PLUS << std::endl;
-	std::cout << "TS_STAR= " << TS_STAR << std::endl;
-	std::cout << "TS_EOS= " << TS_EOS << std::endl;
-	std::cout <<"TS_INVALID= " << TS_INVALID << std::endl;
 
 	//initialize table
 	table[NTS_E][TS_ID] = 1;
@@ -191,23 +184,27 @@ void syntax(std::string lineString)
 	table[NTS_R][TS_EOS]=6;
 	table[NTS_F][TS_ID]=9;
 	table[NTS_F][TS_L_PARENS]=10;
+	table[NTS_S][TS_ID]=11;
+	table[NTS_A][TS_ID]=12;
 
 
 	line+="$";// append EOL symbol($) to end of line
+	ss.push(TS_EOS);
+	for (int j=0;j<line.length();j++){
+		if(line[j]== '='){
+			ss.push(NTS_S);
+		}else{
+			ss.push(NTS_E);
+		}
+	}
 
-
-	ss.push(TS_EOS);// initialize stack witb EOL
-	ss.push(NTS_E); // initialize stack with non terminal
 
 	int i = 0; // strng iterator
 
 	while (!ss.empty() && i<line.size()){
-		if(line[i] == '='){
-			i++;
-		}
 
 		if(ss.top() == TS_ID || ss.top() == TS_MINUS || ss.top() == TS_PLUS || ss.top() == TS_STAR || ss.top() == TS_DIV ||
-				ss.top() == TS_R_PARENS || ss.top() == TS_L_PARENS || ss.top() == TS_EOS){
+				ss.top() == TS_R_PARENS || ss.top() == TS_L_PARENS || ss.top() == TS_EOS || ss.top() == TS_EQUAL){
 
 			if (lexer(line[i]) == ss.top()){
 				std::cout<<"Matched Symbols: " << lexer(line[i]) << ", " << line[i] << std::endl;
@@ -217,9 +214,8 @@ void syntax(std::string lineString)
 					break;
 				}
 				i++;
-				if(!ss.empty()){
 					ss.pop();
-				}
+
 				std::cout << ss.size() << std::endl;
 				}else{
 					std::cout<< "SYNTAX ERROR" << std::endl;
@@ -296,11 +292,24 @@ void syntax(std::string lineString)
 
 						case 10: // F--> (E)
 						std::cout << "<F>---> <id>" << std::endl;
+						ss.pop();
 						ss.push(TS_R_PARENS);
 						ss.push(NTS_E);
 						ss.push(TS_L_PARENS);
 						break;
 
+						case 11: //S-->A
+						std::cout << "<STATEMENT>--><ASSIGNMENT" << std::endl;
+						ss.pop();
+						ss.push(NTS_A);
+						break;
+
+						case 12: // A--> ID=E
+						std::cout << "<ASSIGNMENT>--><ID><=><EXPRESSION>" << std::endl;
+						ss.pop();
+						ss.push(NTS_E);
+						ss.push(TS_EQUAL);
+						ss.push(TS_ID);
 						default: std::cout << "error in cases" << std::endl;
 				}
 			}else{
