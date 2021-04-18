@@ -130,8 +130,7 @@ enum Symbols{
 	NTS_S, // S  18
 	NTS_A, // A   19
 	NTS_D, // D 20
-	NTS_TYPE, // TYPE 21
-	NTS_ID // ID 22
+	NTS_TYPE // TYPE 21
 
 
 };
@@ -200,7 +199,6 @@ void syntax(std::string lineString)
 
 		if( isOperator(lineString[f]) || lineString[f] == ' ')
 		{
-			std::cout << constructedWord << std::endl;
 			line.push_back(constructedWord);
 			constructedWord.clear();
 			continue;
@@ -214,7 +212,6 @@ void syntax(std::string lineString)
 
 		if (nextWord == true)
 		{
-			std::cout << constructedWord << std::endl;
 			constructedWord.clear();
 			nextWord = false;
 			continue;
@@ -250,7 +247,7 @@ void syntax(std::string lineString)
 	table[NTS_TYPE][TS_INT]=15;
 	table[NTS_TYPE][TS_FLOAT]=16;
 	table[NTS_TYPE][TS_BOOL]=17;
-	table[NTS_ID][TS_ID]=18;
+
 
 
 
@@ -273,7 +270,8 @@ void syntax(std::string lineString)
 
 
 	std::vector<std::string >:: const_iterator i = line.begin(); // strng iterator
-
+	std::cout << "LEXEME: " << *i << std::endl;
+	std::cout << std::endl;
 	while (!ss.empty() && i!=line.end()){
 		while(*i == " "){
 			i++;
@@ -283,17 +281,17 @@ void syntax(std::string lineString)
 			ss.top()==TS_INT || ss.top()==TS_BOOL){
 
 			if (lexer(*i) == ss.top()){
-				std::cout<<"Matched Symbols: " << lexer(*i) << ", " << *i << std::endl;
 				if(ss.top() == TS_EOS && lexer(*i)== TS_EOS){
 					//maybe return true
+					std::cout << "-----------------------------------------" << std::endl;
 					std::cout << "LINE DONE" << std::endl;
-					std::cout << "SS and LINE == TS_EOS" << std::endl;
+					std:: cout << std::endl;
 					break;
 				}
 				i++;
-					ss.pop();
-
-				std::cout << ss.size() << std::endl;
+				ss.pop();
+				std::cout << "LEXEME: " << *i << std::endl;
+				std:: cout << std::endl;
 				}else{
 					std::cout<< "SYNTAX ERROR" << std::endl;
 					return;
@@ -301,20 +299,18 @@ void syntax(std::string lineString)
 				}
 		}else{
 
-				std::cout << "Switch table Starts: " << std::endl;
-				std::cout << "Stack: " << ss.top() << " String: " << lexer(*i) << ", " << *i <<std::endl;
 
 				if(table[ss.top()][lexer(*i)] != 0){   // check table position is not blank
 					switch (table[ss.top()][lexer(*i)]){  // check table position in cases
 						case 1: // E-> TQ
-						std::cout<<"<Expression>--> <Term><Expression>"<< std::endl;
+						std::cout<<"<Expression> --> <Term> <Expression>"<< std::endl;
 						ss.pop();
 						ss.push(NTS_Q);
 						ss.push(NTS_T);
 						break;
 
 						case 2: //Q -> +TQ
-						std::cout<<"<ExpressionPrime>--> <PLUS><TERM><Q>"<< std::endl;
+						std::cout<<"<ExpressionPrime> --> <PLUS> <TERM> <Q>"<< std::endl;
 						ss.pop();
 						ss.push(NTS_Q);
 						ss.push(NTS_T);
@@ -322,7 +318,7 @@ void syntax(std::string lineString)
 						break;
 
 						case 3: // Q-->-TQ
-						std::cout<<"<Term>--><MINUS><TERM><Q>"<< std::endl;
+						std::cout<<"<Term>--><MINUS> <TERM> <Q>"<< std::endl;
 						ss.pop();
 						ss.push(NTS_Q);
 						ss.push(NTS_T);
@@ -330,24 +326,24 @@ void syntax(std::string lineString)
 						break;
 
 						case 4: // T-> e
-						std::cout<<"<Term>--><EPSILON>"<< std::endl;
+						std::cout<<"<Term> --> <EPSILON>"<< std::endl;
 						ss.pop();
 						break;
 
 						case 5: // T-> FR
-						std::cout<<"<Term>--><F><R>"<< std::endl;
+						std::cout<<"<Term> --> <FACTOR> <R>"<< std::endl;
 						ss.pop();
 						ss.push(NTS_R);
 						ss.push(NTS_F);
 						break;
 
 						case 6: //R--> e
-						std::cout<<"<R>--><EPSILON>"<< std::endl;
+						std::cout<<"<R> --> <EPSILON>"<< std::endl;
 						ss.pop();
 						break;
 
 						case 7: // R--*FR
-						std::cout<<"<R>--><MULTIPLY><F><R>"<< std::endl;
+						std::cout<<"<R> --> <MULTIPLY> <FACTOR> <R>"<< std::endl;
 						ss.pop();
 						ss.push(NTS_R);
 						ss.push(NTS_F);
@@ -355,7 +351,7 @@ void syntax(std::string lineString)
 						break;
 
 						case 8: // R --> /FR
-						std::cout << "<R>--><DIV><F><R>" << std::endl;
+						std::cout << "<R> --> <DIV> <FACTOR> <R>" << std::endl;
 						ss.pop();
 						ss.push(NTS_R);
 						ss.push(NTS_F);
@@ -363,13 +359,13 @@ void syntax(std::string lineString)
 						break;
 
 						case 9: // F--> id
-						std::cout << "<F>--><id>" << std::endl;
+						std::cout << "<F> --> <id>" << std::endl;
 						ss.pop();
 						ss.push(TS_ID);
 						break;
 
 						case 10: // F--> (E)
-						std::cout << "<F>---> <id>" << std::endl;
+						std::cout << "<F> ---> <(E)>" << std::endl;
 						ss.pop();
 						ss.push(TS_R_PARENS);
 						ss.push(NTS_E);
@@ -377,19 +373,19 @@ void syntax(std::string lineString)
 						break;
 
 						case 11: //S-->A
-						std::cout << "<STATEMENT>--><ASSIGNMENT>" << std::endl;
+						std::cout << "<STATEMENT> --> <ASSIGNMENT>" << std::endl;
 						ss.pop();
 						ss.push(NTS_A);
 						break;
 
 						case 12: // S-->D
-						std::cout << "<STATEMENT>--><DECLARATIVE>" << std::endl;
+						std::cout << "<STATEMENT> --> <DECLARATIVE>" << std::endl;
 						ss.pop();
 						ss.push(NTS_D);
 						break;
 
 						case 13: // A--> ID=E
-						std::cout << "<ASSIGNMENT>--><ID><=><EXPRESSION>" << std::endl;
+						std::cout << "<ASSIGNMENT> --> <ID> <=> <EXPRESSION>" << std::endl;
 						ss.pop();
 						ss.push(NTS_E);
 						ss.push(TS_EQUAL);
@@ -397,42 +393,39 @@ void syntax(std::string lineString)
 						break;
 
 						case 14: // D-->NTS_TYPE
-						std::cout << "<DECLARATIVE>--><TYPE" << std::endl;
+						std::cout << "<DECLARATIVE> --> <TYPE>" << std::endl;
 						ss.pop();
-						ss.push(NTS_ID);
 						ss.push(NTS_TYPE);
 						break;
 
-						case 15: //TYPE-->BOOL
-						std::cout << "<TYPE>--<bool" << std::endl;
+						case 15: //TYPE-->INT
+						std::cout << "<TYPE> --> <int>" << std::endl;
 						ss.pop();
-						ss.push(TS_BOOL);
+						ss.push(NTS_S);
+						ss.push(TS_INT);
 						break;
 
 						case 16: //TYPE-- float
-						std::cout << "<TYPE>--><float>" << std::endl;
+						std::cout << "<TYPE> --> <float>" << std::endl;
 						ss.pop();
+						ss.push(NTS_S);
 						ss.push(TS_FLOAT);
 						break;
 
-						case 17: // TYpe--> int
-						std::cout<< "<TYPE>--><int>" << std::endl;
+						case 17: // TYpe--> bool
+						std::cout<< "<TYPE> --> <bool>" << std::endl;
 						ss.pop();
-						ss.push(TS_INT);
+						ss.push(NTS_S);
+						ss.push(TS_BOOL);
 						break;
 
-						ss.push(TS_INT);
-						break;
-						case 18: // ID->id
-							ss.pop();
-							ss.push(TS_ID);
-							break;
 
 
 						default: std::cout << "error in cases" << std::endl;
 				}
 			}else{
 				std::cout << "Syntax ERROR" << std::endl;
+				std::cout << "Stack: " << ss.top() << " Token: " << *i << std::endl;
 				return;
 
 			}
