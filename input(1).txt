@@ -1,6 +1,6 @@
 ! this is comment for this sample test code for the assignment operator, the ; is optional!
 
-alpha=Ark+b;
-a=c+d;
+alpha=ark+b;
+int a=c+d;
 a=e-f;
 a=g*n;

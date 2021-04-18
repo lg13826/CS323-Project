@@ -118,39 +118,51 @@ enum Symbols{
 	TS_DIV, // /  7
 	TS_INVALID, // invalid Token 8
 	TS_EQUAL, // = 9
+	TS_INT, // int 10
+	TS_BOOL, // bool 11
+	TS_FLOAT, //float 12
 	//non-terminal
-	NTS_E, // E  10
-	NTS_Q, // Q  11
-	NTS_T, // T  12
-	NTS_R, // R  13
-	NTS_F, // F  14
-	NTS_S, // S  15
-	NTS_A // A   16
+	NTS_E, // E  13
+	NTS_Q, // Q  14
+	NTS_T, // T  15
+	NTS_R, // R  16
+	NTS_F, // F  17
+	NTS_S, // S  18
+	NTS_A, // A   19
+	NTS_D, // D 20
+	NTS_TYPE // TYPE 21
 
 
 };
 
-Symbols lexer(char a){
-	std:: string b;
-	b.push_back(a);
-	if(a!='$' && isIdentifier(b)){
+Symbols lexer(std::string a){
+	char b = a[0];
+	if(a!="$" && isIdentifier(a)){
 		return TS_ID;
+	}else if(a!="$" && isKeyword(a)){
+		switch(b){
+		case 'b': return TS_BOOL;
+		case 'i': return TS_INT;
+		case 'f': return TS_FLOAT;
 	}
-	switch(a) {
-	case '(': return TS_L_PARENS;
-	case ')':	return TS_R_PARENS;
-	case '+':	return TS_PLUS;
-	case '*':return TS_STAR;
-	case '/':return TS_DIV;
-	case '-':return TS_MINUS;
-	case '$':	return TS_EOS;
-	case '=': return TS_EQUAL;
-	default:
-		std::cout<< "found invalid for " << a << " in lexer" << std::endl;
-		return TS_INVALID;
+}
+		switch(b) {
+		case '(': return TS_L_PARENS;
+		case ')':	return TS_R_PARENS;
+		case '+':	return TS_PLUS;
+		case '*':return TS_STAR;
+		case '/':return TS_DIV;
+		case '-':return TS_MINUS;
+		case '$':	return TS_EOS;
+		case '=': return TS_EQUAL;
+		default:
+			std::cout<< "found invalid for " << a << " in lexer" << std::endl;
+			return TS_INVALID;
+	}
 
-}
-}
+
+};
+
 
 void syntax(std::string lineString)
 {
@@ -159,9 +171,9 @@ void syntax(std::string lineString)
 	}
 	std::cout<<lineString<< std::endl;
 	std::stack<Symbols> ss; //symbol stack
-	int table[20][20]; // table for rules
-	std::vector<std::string> line; 
-	
+	int table[25][25]; // table for rules
+	std::vector<std::string> line;
+
 	bool nextWord = false;
 	std::string constructedWord;
 	constructedWord.clear(); // initialized
@@ -183,7 +195,7 @@ void syntax(std::string lineString)
 			line.push_back(constructedWord);
 			nextWord = true;
 		}
-		
+
 		if (nextWord == true)
 		{
 			std::cout << constructedWord << std::endl;
@@ -212,7 +224,17 @@ void syntax(std::string lineString)
 	table[NTS_F][TS_ID]=9;
 	table[NTS_F][TS_L_PARENS]=10;
 	table[NTS_S][TS_ID]=11;
-	table[NTS_A][TS_ID]=12;
+	table[NTS_S][TS_BOOL]=12;
+	table[NTS_S][TS_INT]=12;
+	table[NTS_S][TS_FLOAT]=12;
+	table[NTS_A][TS_ID]=13;
+	table[NTS_D][TS_BOOL]=14;
+	table[NTS_D][TS_INT]=14;
+	table[NTS_D][TS_FLOAT]=14;
+	table[NTS_TYPE][TS_INT]=15;
+	table[NTS_TYPE][TS_FLOAT]=16;
+	table[NTS_TYPE][TS_BOOL]=17;
+
 
 
 	line.push_back("$");
@@ -228,21 +250,22 @@ void syntax(std::string lineString)
 
 	if (s == true)
 		ss.push(NTS_S);
-	else 
+	else
 		ss.push(NTS_E);
 
 
 
-	int i = 0; // strng iterator
+	std::vector<std::string >:: const_iterator i = line.begin(); // strng iterator
 
-	while (!ss.empty() && i<line.size()){
+	while (!ss.empty() && i!=line.end()){
 
 		if(ss.top() == TS_ID || ss.top() == TS_MINUS || ss.top() == TS_PLUS || ss.top() == TS_STAR || ss.top() == TS_DIV ||
-				ss.top() == TS_R_PARENS || ss.top() == TS_L_PARENS || ss.top() == TS_EOS || ss.top() == TS_EQUAL){
+				ss.top() == TS_R_PARENS || ss.top() == TS_L_PARENS || ss.top() == TS_EOS || ss.top() == TS_EQUAL || ss.top()==TS_FLOAT ||
+			ss.top()==TS_INT || ss.top()==TS_BOOL){
 
-			if (lexer(line[i]) == ss.top()){
-				std::cout<<"Matched Symbols: " << lexer(line[i]) << ", " << line[i] << std::endl;
-				if(ss.top() == TS_EOS && lexer(line[i])== TS_EOS){
+			if (lexer(*i) == ss.top()){
+				std::cout<<"Matched Symbols: " << lexer(*i) << ", " << *i << std::endl;
+				if(ss.top() == TS_EOS && lexer(*i)== TS_EOS){
 					//maybe return true
 					std::cout << "LINE DONE" << std::endl;
 					std::cout << "SS and LINE == TS_EOS" << std::endl;
@@ -259,10 +282,10 @@ void syntax(std::string lineString)
 		}else{
 
 				std::cout << "Switch table Starts: " << std::endl;
-				std::cout << "Stack: " << ss.top() << " String: " << lexer(line[i]) << ", " << line[i] <<std::endl;
+				std::cout << "Stack: " << ss.top() << " String: " << lexer(*i) << ", " << *i <<std::endl;
 
-				if(table[ss.top()][lexer(line[i])] != 0){   // check table position is not blank
-					switch (table[ss.top()][lexer(line[i])]){  // check table position in cases
+				if(table[ss.top()][lexer(*i)] != 0){   // check table position is not blank
+					switch (table[ss.top()][lexer(*i)]){  // check table position in cases
 						case 1: // E-> TQ
 						std::cout<<"<Expression>--> <Term><Expression>"<< std::endl;
 						ss.pop();
@@ -339,13 +362,44 @@ void syntax(std::string lineString)
 						ss.push(NTS_A);
 						break;
 
-						case 12: // A--> ID=E
+						case 12: // S-->D
+						std::cout << "<STATEMENT>--><DECLARATIVE>" << std::endl;
+						ss.pop();
+						ss.push(NTS_D);
+						break;
+
+						case 13: // A--> ID=E
 						std::cout << "<ASSIGNMENT>--><ID><=><EXPRESSION>" << std::endl;
 						ss.pop();
 						ss.push(NTS_E);
 						ss.push(TS_EQUAL);
 						ss.push(TS_ID);
 						break;
+
+						case 14: // D-->NTS_TYPE
+						std::cout << "<DECLARATIVE>--><TYPE" << std::endl;
+						ss.pop();
+						ss.push(NTS_TYPE);
+						break;
+
+						case 15: //TYPE-->BOOL
+						std::cout << "<TYPE>--<bool>" << std::endl;
+						ss.pop();
+						ss.push(TS_BOOL);
+						break;
+
+						case 16: //TYPE-- float
+						std::cout << "<TYPE>--><float>" << std::endl;
+						ss.pop();
+						ss.push(TS_FLOAT);
+						break;
+
+						case 17: // TYpe--> int
+						std::cout<< "<TYPE>--><int>" << std::endl;
+						ss.pop();
+						ss.push(TS_INT);
+						break;
+
 
 						default: std::cout << "error in cases" << std::endl;
 				}
