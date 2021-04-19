@@ -10,14 +10,6 @@
 #include <stack>
 #include <queue>
 
-void appendLineToFile(std::string filePath, std::string line){
-	std::ofstream file;
-	file.open(filePath, std::ios::out|std::ios::app);
-	if(file.fail()){
-		std::cout << "File failed to open" << std::endl;
-	}
-	file << line << std::endl;
-}
 
 enum TokenType
 {
@@ -26,6 +18,42 @@ enum TokenType
 	Identifier_token,
 	Seperator_token
 }; // global token settings
+
+enum Symbols{
+	//Terminal
+	TS_L_PARENS,  // ( 0
+	TS_R_PARENS, // ) 1
+	TS_ID, // id 2
+	TS_PLUS, // + 3
+	TS_STAR, // * 4
+	TS_EOS, // end of stack, $ 5
+	TS_MINUS, // -  6
+	TS_DIV, // /  7
+	TS_INVALID, // invalid Token 8
+	TS_EQUAL, // = 9
+	TS_INT, // int 10
+	TS_BOOL, // bool 11
+	TS_FLOAT, //float 12
+	//non-terminal
+	NTS_E, // E  13
+	NTS_Q, // Q  14
+	NTS_T, // T  15
+	NTS_R, // R  16
+	NTS_F, // F  17
+	NTS_S, // S  18
+	NTS_A, // A   19
+	NTS_D, // D 20
+	NTS_TYPE // TYPE 21
+};
+
+void appendLineToFile(std::string filePath, std::string line){
+	std::ofstream file;
+	file.open(filePath, std::ios::out|std::ios::app);
+	if(file.fail()){
+		std::cout << "File failed to open" << std::endl;
+	}
+	file << line << std::endl;
+}
 
 void ignoreComment(char character, std::ifstream &inputf)
 {
@@ -132,7 +160,7 @@ bool isKeyword(std::string str)
 		case 1: tokenOutput = "KEYWORD"; break;//keyword
 		case 2: tokenOutput = "IDENTIFIER"; break;//identifier
 		case 3: tokenOutput = "SEPERATOR"; break;//seperator
-		default: std::cout << "Broken"; break;
+		default: tokenOutput = "OPERATOR"; break; //default to operator for now
 	}
 	std::string output = "TOKEN: ";
 	output+= tokenOutput;
@@ -143,33 +171,6 @@ bool isKeyword(std::string str)
 
 
 }
-
-enum Symbols{
-	//Terminal
-	TS_L_PARENS,  // ( 0
-	TS_R_PARENS, // ) 1
-	TS_ID, // id 2
-	TS_PLUS, // + 3
-	TS_STAR, // * 4
-	TS_EOS, // end of stack, $ 5
-	TS_MINUS, // -  6
-	TS_DIV, // /  7
-	TS_INVALID, // invalid Token 8
-	TS_EQUAL, // = 9
-	TS_INT, // int 10
-	TS_BOOL, // bool 11
-	TS_FLOAT, //float 12
-	//non-terminal
-	NTS_E, // E  13
-	NTS_Q, // Q  14
-	NTS_T, // T  15
-	NTS_R, // R  16
-	NTS_F, // F  17
-	NTS_S, // S  18
-	NTS_A, // A   19
-	NTS_D, // D 20
-	NTS_TYPE // TYPE 21
-};
 
 Symbols lexer(std::string a){
 
@@ -222,7 +223,6 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 		return;
 	}
 
-	std::cout<<lineString<< std::endl;
 	std::stack<Symbols> ss; //symbol stack
 	int table[25][25]; // table for rules
 	std::vector<std::string> line;
@@ -377,7 +377,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 						break;
 
 						case 4: // T-> e
-						appendLineToFile("output.txt","Term> --> <EPSILON>");
+						appendLineToFile("output.txt","<Term> --> <EPSILON>");
 						ss.pop();
 						break;
 
@@ -502,9 +502,9 @@ int main()
 	// basic user interface
 	do {
 		std::cout << std::string(50, '\n');
-		//std::cout << "Input File Name (EX: input.txt): "; Temporarily disabled for debugging
-		//getline(std::cin, filetoread);
-		inputf.open("input(1).txt"); // open file of name (Temporarily set to input(1).txt for debugging)
+		std::cout << "Input File Name (EX: input.txt): "; //comment out for debugging
+		getline(std::cin, filetoread); //comment out for debugging
+		inputf.open(filetoread); 
 	} while (inputf.fail()); // loop if file name doesn't exist
 	// basic user interface
 
@@ -527,7 +527,6 @@ int main()
 		}
 
 
-		outputf << "Token: ";
 		if (isOperator(entity))
 		{
 			tokenArray.push(Operator_token);
@@ -547,7 +546,6 @@ int main()
 				tokenArray.push(Seperator_token);
 				a_line.push_back(entity);
 			}
-			outputf << "SEPERATOR" << '\t' << "LEXEME: " << '\t' << entity << std::endl;
 		}
 		else do //most likely a word or number, start building the word using characters
 		{
@@ -564,11 +562,11 @@ int main()
 
 			if (isInteger(wordString))
 			{
-				outputf << "INTEGER" << '\t' << "LEXEME: " << '\t' << wordString << std::endl;
+				tokenArray.push(Identifier_token);
 			}
 			else if (isRealNumber(wordString))
 			{
-				outputf << "REAL" << '\t' << "LEXEME: " << '\t' << wordString << std::endl;
+				tokenArray.push(Identifier_token);
 			}
 			else if (isKeyword(wordString))
 			{
