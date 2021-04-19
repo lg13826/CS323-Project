@@ -10,6 +10,15 @@
 #include <stack>
 #include <queue>
 
+void appendLineToFile(std::string filePath, std::string line){
+	std::ofstream file;
+	file.open(filePath, std::ios::out|std::ios::app);
+	if(file.fail()){
+		std::cout << "File failed to open" << std::endl;
+	}
+	file << line << std::endl;
+}
+
 enum TokenType
 {
 	Operator_token,
@@ -114,9 +123,9 @@ bool isKeyword(std::string str)
 	return false;
 }
 
-void outputFunction(std::queue<TokenType> tokenArray, std::vector<std::string>::const_iterator i)
+ void outputFunction(std::queue<TokenType> tokenArray, std::vector<std::string>::const_iterator i)
 {
-	std::string tokenOutput;			
+	std::string tokenOutput;
 	switch (tokenArray.front())
 	{
 		case 0: tokenOutput = "OPERATOR"; break;//operator
@@ -125,8 +134,14 @@ void outputFunction(std::queue<TokenType> tokenArray, std::vector<std::string>::
 		case 3: tokenOutput = "SEPERATOR"; break;//seperator
 		default: std::cout << "Broken"; break;
 	}
-	std::cout << "TOKEN: " << tokenOutput << "\t" << "LEXEME: " << *i << std::endl;
-	tokenArray.pop();
+	std::string output = "TOKEN: ";
+	output+= tokenOutput;
+	output += "      LEXEME: ";
+	output+= *i;
+	appendLineToFile("output.txt", " ");
+	appendLineToFile("output.txt", output);
+
+
 }
 
 enum Symbols{
@@ -206,6 +221,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 	if(lineString.size() == 0){
 		return;
 	}
+
 	std::cout<<lineString<< std::endl;
 	std::stack<Symbols> ss; //symbol stack
 	int table[25][25]; // table for rules
@@ -290,12 +306,11 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 
 	// token stuff
 	bool firstGoAround = false;
-	
+
 
 
 	std::vector<std::string >:: const_iterator i = line.begin(); // strng iterator
-	std::cout << "LEXEME: " << *i << std::endl;
-	std::cout << std::endl;
+
 	while (!ss.empty() && i!=line.end()){
 		while(*i == " "){
 			i++;
@@ -304,6 +319,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 		if (!firstGoAround)
 		{
 			outputFunction(tokenArray, i);
+			tokenArray.pop();
 			firstGoAround = true;
 		}
 
@@ -314,18 +330,21 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 			if (lexer(*i) == ss.top()){
 				if(ss.top() == TS_EOS && lexer(*i)== TS_EOS){
 					//maybe return true
-					std::cout << "-----------------------------------------" << std::endl;
-					std::cout << "LINE DONE" << std::endl;
-					std:: cout << std::endl;
+					appendLineToFile("output.txt", "");
+					appendLineToFile("output.txt","-----------------------------------------");
+					appendLineToFile("output.txt","LINE DONE");
+					appendLineToFile("output.txt", " ");
+
 					break;
 				}
 				i++;
 				ss.pop();
+				outputFunction(tokenArray, i);
+				tokenArray.pop();
 
-				
 				std:: cout << std::endl;
 				}else{
-					std::cout<< "SYNTAX ERROR" << std::endl;
+					appendLineToFile("output.txt","SYNTAX ERROR");
 					return;
 					//maybe return false
 				}
@@ -335,14 +354,14 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 				if(table[ss.top()][lexer(*i)] != 0){   // check table position is not blank
 					switch (table[ss.top()][lexer(*i)]){  // check table position in cases
 						case 1: // E-> TQ
-						std::cout<<"<Expression> --> <Term> <Expression>"<< std::endl;
+						appendLineToFile("output.txt","<Expression> --> <Term> <Expression>");
 						ss.pop();
 						ss.push(NTS_Q);
 						ss.push(NTS_T);
 						break;
 
 						case 2: //Q -> +TQ
-						std::cout<<"<ExpressionPrime> --> <PLUS> <TERM> <Q>"<< std::endl;
+						appendLineToFile("output.txt","<ExpressionPrime> --> <PLUS> <TERM> <Q>");
 						ss.pop();
 						ss.push(NTS_Q);
 						ss.push(NTS_T);
@@ -350,7 +369,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 						break;
 
 						case 3: // Q-->-TQ
-						std::cout<<"<Term>--><MINUS> <TERM> <Q>"<< std::endl;
+						appendLineToFile("output.txt","<Term>--><MINUS> <TERM> <Q>");
 						ss.pop();
 						ss.push(NTS_Q);
 						ss.push(NTS_T);
@@ -358,24 +377,24 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 						break;
 
 						case 4: // T-> e
-						std::cout<<"<Term> --> <EPSILON>"<< std::endl;
+						appendLineToFile("output.txt","Term> --> <EPSILON>");
 						ss.pop();
 						break;
 
 						case 5: // T-> FR
-						std::cout<<"<Term> --> <FACTOR> <R>"<< std::endl;
+						appendLineToFile("output.txt","<Term> --> <FACTOR> <R>");
 						ss.pop();
 						ss.push(NTS_R);
 						ss.push(NTS_F);
 						break;
 
 						case 6: //R--> e
-						std::cout<<"<R> --> <EPSILON>"<< std::endl;
+						appendLineToFile("output.txt","<R> --> <EPSILON>");
 						ss.pop();
 						break;
 
 						case 7: // R--*FR
-						std::cout<<"<R> --> <MULTIPLY> <FACTOR> <R>"<< std::endl;
+						appendLineToFile("output.txt","<R> --> <MULTIPLY> <FACTOR> <R>");
 						ss.pop();
 						ss.push(NTS_R);
 						ss.push(NTS_F);
@@ -383,7 +402,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 						break;
 
 						case 8: // R --> /FR
-						std::cout << "<R> --> <DIV> <FACTOR> <R>" << std::endl;
+						appendLineToFile("output.txt", "<R> --> <DIV> <FACTOR> <R>");
 						ss.pop();
 						ss.push(NTS_R);
 						ss.push(NTS_F);
@@ -391,13 +410,13 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 						break;
 
 						case 9: // F--> id
-						std::cout << "<F> --> <id>" << std::endl;
+						appendLineToFile("output.txt", "<F> --> <id>");
 						ss.pop();
 						ss.push(TS_ID);
 						break;
 
 						case 10: // F--> (E)
-						std::cout << "<F> ---> <(E)>" << std::endl;
+						appendLineToFile("output.txt","<F> ---> <(E)>");
 						ss.pop();
 						ss.push(TS_R_PARENS);
 						ss.push(NTS_E);
@@ -405,19 +424,19 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 						break;
 
 						case 11: //S-->A
-						std::cout << "<STATEMENT> --> <ASSIGNMENT>" << std::endl;
+						appendLineToFile("output.txt","<STATEMENT> --> <ASSIGNMENT>");
 						ss.pop();
 						ss.push(NTS_A);
 						break;
 
 						case 12: // S-->D
-						std::cout << "<STATEMENT> --> <DECLARATIVE>" << std::endl;
+						appendLineToFile("output.txt","<STATEMENT> --> <DECLARATIVE>");
 						ss.pop();
 						ss.push(NTS_D);
 						break;
 
 						case 13: // A--> ID=E
-						std::cout << "<ASSIGNMENT> --> <ID> <=> <EXPRESSION>" << std::endl;
+						appendLineToFile("output.txt","<ASSIGNMENT> --> <ID> <=> <EXPRESSION>");
 						ss.pop();
 						ss.push(NTS_E);
 						ss.push(TS_EQUAL);
@@ -425,27 +444,27 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 						break;
 
 						case 14: // D-->NTS_TYPE
-						std::cout << "<DECLARATIVE> --> <TYPE>" << std::endl;
+						appendLineToFile("output.txt","<DECLARATIVE> --> <TYPE>");
 						ss.pop();
 						ss.push(NTS_TYPE);
 						break;
 
 						case 15: //TYPE-->INT
-						std::cout << "<TYPE> --> <int>" << std::endl;
+						appendLineToFile("output.txt","<TYPE> --> <int>");
 						ss.pop();
 						ss.push(NTS_S);
 						ss.push(TS_INT);
 						break;
 
 						case 16: //TYPE-- float
-						std::cout << "<TYPE> --> <float>" << std::endl;
+						appendLineToFile("output.txt","<TYPE> --> <float>");
 						ss.pop();
 						ss.push(NTS_S);
 						ss.push(TS_FLOAT);
 						break;
 
 						case 17: // TYpe--> bool
-						std::cout<< "<TYPE> --> <bool>" << std::endl;
+						appendLineToFile("output.txt","<TYPE> --> <bool>");
 						ss.pop();
 						ss.push(NTS_S);
 						ss.push(TS_BOOL);
@@ -453,10 +472,10 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 
 
 
-						default: std::cout << "error in cases" << std::endl;
+						default: appendLineToFile("output.txt","error in cases");
 				}
 			}else{
-				std::cout << "Syntax ERROR" << std::endl;
+				appendLineToFile("output.txt","Syntax ERROR");
 				std::cout << "Stack: " << ss.top() << " Token: " << *i << std::endl;
 				return;
 
@@ -552,7 +571,7 @@ int main()
 				outputf << "REAL" << '\t' << "LEXEME: " << '\t' << wordString << std::endl;
 			}
 			else if (isKeyword(wordString))
-			{	
+			{
 				tokenArray.push(Keyword_token);
 			}
 			else if (isIdentifier(wordString))
