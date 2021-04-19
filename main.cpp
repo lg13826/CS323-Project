@@ -8,8 +8,15 @@
 #include <vector>
 #include <map>
 #include <stack>
+#include <queue>
 
-//include additional function files here
+enum TokenType
+{
+	Operator_token,
+	Keyword_token,
+	Identifier_token,
+	Seperator_token
+}; // global token settings
 
 void ignoreComment(char character, std::ifstream &inputf)
 {
@@ -106,6 +113,22 @@ bool isKeyword(std::string str)
 // if no string is the same as library, return false
 	return false;
 }
+
+void outputFunction(std::queue<TokenType> tokenArray, std::vector<std::string>::const_iterator i)
+{
+	std::string tokenOutput;			
+	switch (tokenArray.front())
+	{
+		case 0: tokenOutput = "OPERATOR"; break;//operator
+		case 1: tokenOutput = "KEYWORD"; break;//keyword
+		case 2: tokenOutput = "IDENTIFIER"; break;//identifier
+		case 3: tokenOutput = "SEPERATOR"; break;//seperator
+		default: std::cout << "Broken"; break;
+	}
+	std::cout << "TOKEN: " << tokenOutput << "\t" << "LEXEME: " << *i << std::endl;
+	tokenArray.pop();
+}
+
 enum Symbols{
 	//Terminal
 	TS_L_PARENS,  // ( 0
@@ -131,8 +154,6 @@ enum Symbols{
 	NTS_A, // A   19
 	NTS_D, // D 20
 	NTS_TYPE // TYPE 21
-
-
 };
 
 Symbols lexer(std::string a){
@@ -180,7 +201,7 @@ Symbols lexer(std::string a){
 };
 
 
-void syntax(std::string lineString)
+void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 {
 	if(lineString.size() == 0){
 		return;
@@ -267,6 +288,9 @@ void syntax(std::string lineString)
 	else
 		ss.push(NTS_E);
 
+	// token stuff
+	bool firstGoAround = false;
+	
 
 
 	std::vector<std::string >:: const_iterator i = line.begin(); // strng iterator
@@ -276,6 +300,13 @@ void syntax(std::string lineString)
 		while(*i == " "){
 			i++;
 		}
+
+		if (!firstGoAround)
+		{
+			outputFunction(tokenArray, i);
+			firstGoAround = true;
+		}
+
 		if(ss.top() == TS_ID || ss.top() == TS_MINUS || ss.top() == TS_PLUS || ss.top() == TS_STAR || ss.top() == TS_DIV ||
 				ss.top() == TS_R_PARENS || ss.top() == TS_L_PARENS || ss.top() == TS_EOS || ss.top() == TS_EQUAL || ss.top()==TS_FLOAT ||
 			ss.top()==TS_INT || ss.top()==TS_BOOL){
@@ -290,7 +321,8 @@ void syntax(std::string lineString)
 				}
 				i++;
 				ss.pop();
-				std::cout << "LEXEME: " << *i << std::endl;
+
+				
 				std:: cout << std::endl;
 				}else{
 					std::cout<< "SYNTAX ERROR" << std::endl;
@@ -433,6 +465,7 @@ void syntax(std::string lineString)
 	}
 
 	}
+	firstGoAround = false;
 	return;
 }
 
@@ -462,6 +495,8 @@ int main()
 	std::vector<char> word; // this will push characters into a vector for when word is being processed...
 	bool wordFormulation = false; // this will be a sentry value to check if word formulation is being done, default false.
 
+	std::queue<TokenType> tokenArray; // this will be used to check what to output in the syntax section
+
 	while (inputf.eof() == false) // go through input.txt and read each word.
 	{
 		inputf >> entity;
@@ -476,18 +511,23 @@ int main()
 		outputf << "Token: ";
 		if (isOperator(entity))
 		{
+			tokenArray.push(Operator_token);
 			a_line.push_back(entity);
-			outputf << "OPERATOR" << '\t' << '\t' << "LEXEME: " << '\t' << entity << std::endl;
 		}
 		else if (isSeperator(entity))
 		{
 			if (entity = ';')
 			{
-				syntax(a_line);
-				a_line.clear();
+				syntax(a_line, tokenArray); //sends the line to syntax
+				while (tokenArray.empty() == false)
+					tokenArray.pop(); // clears tokens
+				a_line.clear(); // clears line
 			}
 			else
+			{
+				tokenArray.push(Seperator_token);
 				a_line.push_back(entity);
+			}
 			outputf << "SEPERATOR" << '\t' << "LEXEME: " << '\t' << entity << std::endl;
 		}
 		else do //most likely a word or number, start building the word using characters
@@ -512,29 +552,31 @@ int main()
 				outputf << "REAL" << '\t' << "LEXEME: " << '\t' << wordString << std::endl;
 			}
 			else if (isKeyword(wordString))
-			{
-				outputf << "KEYWORD" << '\t' << "LEXEME: " << '\t' << wordString << std::endl;
+			{	
+				tokenArray.push(Keyword_token);
 			}
 			else if (isIdentifier(wordString))
 			{
-				outputf << "IDENTIFIER" << '\t' << "LEXEME: " << '\t' << wordString << std::endl;
+				tokenArray.push(Identifier_token);
 			}
 			if (isOperator(entity))
 			{
 				a_line.push_back(entity);
-				outputf << "Token: ";
-				outputf << "OPERATOR" << '\t' << '\t' << "LEXEME: " << '\t' << entity << std::endl;
+				tokenArray.push(Operator_token);
 			}
 			else if (isSeperator(entity))
 			{
 				if (entity = ';')
 				{
-					syntax(a_line);
+					syntax(a_line, tokenArray);
 					a_line.clear();
+					while (tokenArray.empty() == false)
+						tokenArray.pop(); // clears tokens
 				} else
+				{
 					a_line.push_back(entity);
-				outputf << "Token: ";
-				outputf << "SEPERATOR" << '\t' << "LEXEME: " << '\t' << entity << std::endl;
+					tokenArray.push(Seperator_token);
+				}
 			}
 			word.clear(); // clear word
 			wordFormulation = false;

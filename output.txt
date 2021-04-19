@@ -1,28 +1,3 @@
 Group Members: Kim Eaton, Luciano Gibertoni, Yanessa Vazquez
 
-Token: IDENTIFIER	LEXEME: 	alpha
-Token: OPERATOR		LEXEME: 	=
-Token: IDENTIFIER	LEXEME: 	ark
-Token: OPERATOR		LEXEME: 	+
-Token: IDENTIFIER	LEXEME: 	b
-Token: SEPERATOR	LEXEME: 	;
-Token: KEYWORD	LEXEME: 	int
-Token: IDENTIFIER	LEXEME: 	a
-Token: OPERATOR		LEXEME: 	=
-Token: IDENTIFIER	LEXEME: 	c
-Token: OPERATOR		LEXEME: 	+
-Token: IDENTIFIER	LEXEME: 	d
-Token: SEPERATOR	LEXEME: 	;
-Token: IDENTIFIER	LEXEME: 	a
-Token: OPERATOR		LEXEME: 	=
-Token: IDENTIFIER	LEXEME: 	e
-Token: OPERATOR		LEXEME: 	-
-Token: IDENTIFIER	LEXEME: 	f
-Token: SEPERATOR	LEXEME: 	;
-Token: IDENTIFIER	LEXEME: 	a
-Token: OPERATOR		LEXEME: 	=
-Token: IDENTIFIER	LEXEME: 	g
-Token: OPERATOR		LEXEME: 	*
-Token: IDENTIFIER	LEXEME: 	n
-Token: SEPERATOR	LEXEME: 	;
-Token: SEPERATOR	LEXEME: 	;
+Token: Token: Token: Token: Token: Token: Token: Token: Token: Token: Token: Token: Token: Token: SEPERATOR	LEXEME: 	;
