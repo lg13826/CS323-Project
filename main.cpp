@@ -491,6 +491,8 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 
 int main()
 {
+	bool debugMode = true; // disables user interface and loads input.txt automatically
+
 	char entity;
 	std::string a_line;
 	a_line.clear(); //cleans string
@@ -500,13 +502,19 @@ int main()
 
 
 	// basic user interface
-	do {
-		std::cout << std::string(50, '\n');
-		std::cout << "Input File Name (EX: input.txt): "; //comment out for debugging
-		getline(std::cin, filetoread); //comment out for debugging
-		inputf.open(filetoread); 
-	} while (inputf.fail()); // loop if file name doesn't exist
-	// basic user interface
+	if (debugMode == false)
+	{
+		do {
+			std::cout << std::string(50, '\n');
+			std::cout << "Input File Name (EX: input.txt): "; //comment out for debugging
+			getline(std::cin, filetoread); //comment out for debugging
+			inputf.open(filetoread); 
+		} while (inputf.fail()); // loop if file name doesn't exist
+		// basic user interface
+	}	
+	else
+		inputf.open("input.txt");
+
 
 	std::ofstream outputf("output.txt");
 	outputf << "Group Members: Kim Eaton, Luciano Gibertoni, Yanessa Vazquez" << std::endl << std::endl;
