@@ -220,15 +220,15 @@ Symbols lexer(std::string a){
 void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 {
 	// Lexer gives us a Line that needs to be cleaned up
-	// token Array is the list of every Terminal Symbol 
-	// and Non-Terminal Symbol the lexer encounters IN ORDER. 
+	// token Array is the list of every Terminal Symbol
+	// and Non-Terminal Symbol the lexer encounters IN ORDER.
 
 	//Bottom-up Table Definitions initialization
 	std::string bottomUpTable[11][11];
 	bottomUpTable[0][TS_ID] = "S5";
 	bottomUpTable[0][TS_L_PARENS] = "S5";
 	bottomUpTable[0][NTS_E] = "1";
-	bottomUpTable[0][NTS_T] = "2";	
+	bottomUpTable[0][NTS_T] = "2";
 	bottomUpTable[0][NTS_F] = "3";
 
 	bottomUpTable[1][TS_PLUS] = "S6";
@@ -300,7 +300,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 	// END OF TABLE DEFINITIONS
 
 
-	
+
 	std::vector<std::string> input;
 	bool nextWord = false;
 	std::string constructedWord;
@@ -334,20 +334,70 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 			nextWord = false;
 			continue;
 		}
-	}	
+	}
 	input.push_back("$"); // add EOL symbol($) to input stack
 
 	// append EOL symbol($) and '0' to stack.
-	std::stack<char> characterStack; // initialize Stack
-	characterStack.push('$');
-	characterStack.push('0');
+	std::stack<std::string> characterStack; // initialize Stack
+	characterStack.push("$");
+	characterStack.push("0");
 
 
 
 	if(lineString.size() == 0){ // if the Lexer gave us nothing, exit.
 		return;
 	}
-	
+
+	// bool to exist loop
+	bool acct = false;
+	bool error = false;
+	// iteratoer for string array of input
+	std::vector<std::string >:: const_iterator place = input.begin();
+
+
+	while(!acct || !error){
+		//holds top of nstack for table indexing
+		int qm = atoi(characterStack.top().c_str());
+		// holds input string for table indexing
+		Symbols i = lexer(*place);
+		// x hold table index spot
+		std::string tableEntry = bottomUpTable[qm][i];
+
+// if string x[0] == S process shift
+ 		if(tableEntry[0]== 'S'){
+			// push input on to Stack then push number from table entry, increment line
+			characterStack.push(*place);
+			std::string number = tableEntry.substr(1,2);
+			characterStack.push(number);
+			place++;
+			// if R do reduce process
+		}else if (tableEntry[0] == 'R'){
+			// holds counter for popping
+		 auto g = 2*stoi(tableEntry,(std::size_t) 1);
+			//loop to pop stack specified amount of times
+			for(int f = 0; f<g ; f++){
+				characterStack.pop();
+			}
+			// qj holds top of stack
+			  int qj =  atoi(characterStack.top().substr(1,2));
+				// qk holds table index qj, stack top
+				std:: string qk = bottomUpTable[qj][lexer(*place)];
+				// push qk onto stack individually
+				for(int k = 0; k< qk.length()-1; k++){
+					characterStack.push(qk.substr(k,1));
+				}
+
+					// if end of line, accept
+			}else if (tableEntry[0] == '$'){
+				acct = true;
+				// if does not work in table, error = true
+			}else{
+				error =true;
+			}
+		}
+
+
+
 
 	/*
 	int table[25][25]; // table for rules
@@ -407,7 +457,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 			nextWord = false;
 			continue;
 		}
-	}	
+	}
 
 	line.push_back("$");
 	//line+="$";// append EOL symbol($) to end of line
@@ -630,10 +680,10 @@ int main()
 			std::cout << std::string(50, '\n');
 			std::cout << "Input File Name (EX: input.txt): "; //comment out for debugging
 			getline(std::cin, filetoread); //comment out for debugging
-			inputf.open(filetoread); 
+			inputf.open(filetoread);
 		} while (inputf.fail()); // loop if file name doesn't exist
 		// basic user interface
-	}	
+	}
 	else
 		inputf.open("input.txt");
 
