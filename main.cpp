@@ -219,12 +219,118 @@ Symbols lexer(std::string a){
 
 void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 {
+
+	//Bottom-up Table Definitions initialization
+	std::stack<Symbols> ss; //symbol stack
+
+	std::string bottomUpTable[11][11];
+	bottomUpTable[0][TS_ID] = "S5";
+	bottomUpTable[0][TS_L_PARENS] = "S5";
+	bottomUpTable[0][NTS_E] = "1";
+	bottomUpTable[0][NTS_T] = "2";	
+	bottomUpTable[0][NTS_F] = "3";
+
+	bottomUpTable[1][TS_PLUS] = "S6";
+	bottomUpTable[1][TS_MINUS] = "S6";
+	bottomUpTable[1][TS_ID] = "S5";
+	bottomUpTable[1][TS_EOS] = "$";
+
+	bottomUpTable[2][TS_PLUS] = "R2";
+	bottomUpTable[2][TS_MINUS] = "R2";
+	bottomUpTable[2][TS_DIV] = "S7";
+	bottomUpTable[2][TS_STAR] = "S7";
+	bottomUpTable[2][TS_R_PARENS] = "R2";
+	bottomUpTable[2][TS_EOS] = "R2";
+
+	bottomUpTable[3][TS_PLUS] = "R4";
+	bottomUpTable[3][TS_MINUS] = "R4";
+	bottomUpTable[3][TS_DIV] = "R4";
+	bottomUpTable[3][TS_STAR] = "R4";
+	bottomUpTable[3][TS_R_PARENS] = "R4";
+	bottomUpTable[3][TS_EOS] = "R4";
+
+	bottomUpTable[4][TS_ID] = "S5";
+	bottomUpTable[4][TS_L_PARENS] = "S4";
+	bottomUpTable[4][NTS_E] = "8";
+	bottomUpTable[4][NTS_T] = "2";
+	bottomUpTable[4][NTS_F] = "3";
+
+	bottomUpTable[5][TS_PLUS] = "R6";
+	bottomUpTable[5][TS_MINUS] = "R6";
+	bottomUpTable[5][TS_STAR] = "R6";
+	bottomUpTable[5][TS_DIV] = "R6";
+	bottomUpTable[5][TS_R_PARENS] = "R6";
+	bottomUpTable[5][TS_EOS] = "R6";
+
+	bottomUpTable[6][TS_ID] = "S5";
+	bottomUpTable[6][TS_L_PARENS] = "S4";
+	bottomUpTable[6][NTS_T] = "9";
+	bottomUpTable[6][NTS_F] = "3";
+
+	bottomUpTable[7][TS_ID] = "S5";
+	bottomUpTable[7][TS_L_PARENS] = "S4";
+	bottomUpTable[7][NTS_F] = "10";
+
+	bottomUpTable[8][TS_PLUS] = "S6";
+	bottomUpTable[8][TS_MINUS] = "S6";
+	bottomUpTable[8][TS_R_PARENS] = "S11";
+
+	bottomUpTable[9][TS_PLUS] = "R1";
+	bottomUpTable[9][TS_MINUS] = "R1";
+	bottomUpTable[9][TS_DIV] = "S7";
+	bottomUpTable[9][TS_STAR] = "S7";
+	bottomUpTable[9][TS_R_PARENS] = "R1";
+	bottomUpTable[9][TS_EOS] = "R1";
+
+	bottomUpTable[10][TS_PLUS] = "R3";
+	bottomUpTable[10][TS_MINUS] = "R3";
+	bottomUpTable[10][TS_DIV] = "R3";
+	bottomUpTable[10][TS_STAR] = "R3";
+	bottomUpTable[10][TS_R_PARENS] = "R3";
+	bottomUpTable[10][TS_EOS] = "R3";
+
+	bottomUpTable[11][TS_PLUS] = "R5";
+	bottomUpTable[11][TS_MINUS] = "R5";
+	bottomUpTable[11][TS_DIV] = "R5";
+	bottomUpTable[11][TS_STAR] = "R5";
+	bottomUpTable[11][TS_R_PARENS] = "R5";
+	bottomUpTable[11][TS_EOS] = "R5";
+
 	if(lineString.size() == 0){
 		return;
 	}
+	
 
-	std::stack<Symbols> ss; //symbol stack
+	/*
 	int table[25][25]; // table for rules
+		//initialize table
+	table[NTS_E][TS_ID] = 1;
+	table[NTS_E][TS_L_PARENS]=1;
+	table[NTS_Q][TS_PLUS]=2;
+	table[NTS_Q][TS_MINUS]=3;
+	table[NTS_Q][TS_R_PARENS]=4;
+	table[NTS_Q][TS_EOS]=4;
+	table[NTS_T][TS_ID] =5;
+	table[NTS_T][TS_L_PARENS] =5;
+	table[NTS_R][TS_PLUS]=6;
+	table[NTS_R][TS_MINUS]=6;
+	table[NTS_R][TS_STAR]=7;
+	table[NTS_R][TS_DIV]=8;
+	table[NTS_R][TS_R_PARENS]=6;
+	table[NTS_R][TS_EOS]=6;
+	table[NTS_F][TS_ID]=9;
+	table[NTS_F][TS_L_PARENS]=10;
+	table[NTS_S][TS_ID]=11;
+	table[NTS_S][TS_BOOL]=12;
+	table[NTS_S][TS_INT]=12;
+	table[NTS_S][TS_FLOAT]=12;
+	table[NTS_A][TS_ID]=13;
+	table[NTS_D][TS_BOOL]=14;
+	table[NTS_D][TS_INT]=14;
+	table[NTS_D][TS_FLOAT]=14;
+	table[NTS_TYPE][TS_INT]=15;
+	table[NTS_TYPE][TS_FLOAT]=16;
+	table[NTS_TYPE][TS_BOOL]=17;
 	std::vector<std::string> line;
 
 	bool nextWord = false;
@@ -253,40 +359,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 			nextWord = false;
 			continue;
 		}
-	}
-
-
-	//initialize table
-	table[NTS_E][TS_ID] = 1;
-	table[NTS_E][TS_L_PARENS]=1;
-	table[NTS_Q][TS_PLUS]=2;
-	table[NTS_Q][TS_MINUS]=3;
-	table[NTS_Q][TS_R_PARENS]=4;
-	table[NTS_Q][TS_EOS]=4;
-	table[NTS_T][TS_ID] =5;
-	table[NTS_T][TS_L_PARENS] =5;
-	table[NTS_R][TS_PLUS]=6;
-	table[NTS_R][TS_MINUS]=6;
-	table[NTS_R][TS_STAR]=7;
-	table[NTS_R][TS_DIV]=8;
-	table[NTS_R][TS_R_PARENS]=6;
-	table[NTS_R][TS_EOS]=6;
-	table[NTS_F][TS_ID]=9;
-	table[NTS_F][TS_L_PARENS]=10;
-	table[NTS_S][TS_ID]=11;
-	table[NTS_S][TS_BOOL]=12;
-	table[NTS_S][TS_INT]=12;
-	table[NTS_S][TS_FLOAT]=12;
-	table[NTS_A][TS_ID]=13;
-	table[NTS_D][TS_BOOL]=14;
-	table[NTS_D][TS_INT]=14;
-	table[NTS_D][TS_FLOAT]=14;
-	table[NTS_TYPE][TS_INT]=15;
-	table[NTS_TYPE][TS_FLOAT]=16;
-	table[NTS_TYPE][TS_BOOL]=17;
-
-
-
+	}	
 
 	line.push_back("$");
 	//line+="$";// append EOL symbol($) to end of line
@@ -485,6 +558,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 
 	}
 	firstGoAround = false;
+	*/
 	return;
 }
 
