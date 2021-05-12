@@ -219,10 +219,11 @@ Symbols lexer(std::string a){
 
 void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 {
+	// Lexer gives us a Line that needs to be cleaned up
+	// token Array is the list of every Terminal Symbol 
+	// and Non-Terminal Symbol the lexer encounters IN ORDER. 
 
 	//Bottom-up Table Definitions initialization
-	std::stack<Symbols> ss; //symbol stack
-
 	std::string bottomUpTable[11][11];
 	bottomUpTable[0][TS_ID] = "S5";
 	bottomUpTable[0][TS_L_PARENS] = "S5";
@@ -294,9 +295,56 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 	bottomUpTable[11][TS_DIV] = "R5";
 	bottomUpTable[11][TS_STAR] = "R5";
 	bottomUpTable[11][TS_R_PARENS] = "R5";
-	bottomUpTable[11][TS_EOS] = "R5";
+	bottomUpTable[11][TS_EOS] = "R5"; //State: 11, Symbol: $, returns R5 Table entry
+	// STATE -- SYMBOL -- TABLE ENTRY
+	// END OF TABLE DEFINITIONS
 
-	if(lineString.size() == 0){
+
+	
+	std::vector<std::string> input;
+	bool nextWord = false;
+	std::string constructedWord;
+	constructedWord.clear(); // initialized
+
+	// this goes through the Line given by lexer and cleans it up
+	// all words in the line are put into individual vectors
+	// EX: I AM HERE, the vector is the line, each index is a word
+	// Index 1 contains "I", index 2 contains 'AM', index 3 contains 'HERE'
+	// this was done to make it easier for us later on when we needed to compare individual
+	// words with other words within the same line.
+	for(int f = 0; f < lineString.size(); f++){ // loop through each character
+		constructedWord.push_back(lineString[f]); // push lexer word into line
+
+		if( isOperator(lineString[f]) || lineString[f] == ' ')
+		{
+			input.push_back(constructedWord);
+			constructedWord.clear();
+			continue;
+		}
+
+		if( isOperator(lineString[f+1]) )
+		{
+			input.push_back(constructedWord);
+			nextWord = true;
+		}
+
+		if (nextWord == true)
+		{
+			constructedWord.clear();
+			nextWord = false;
+			continue;
+		}
+	}	
+	input.push_back("$"); // add EOL symbol($) to input stack
+
+	// append EOL symbol($) and '0' to stack.
+	std::stack<char> characterStack; // initialize Stack
+	characterStack.push('$');
+	characterStack.push('0');
+
+
+
+	if(lineString.size() == 0){ // if the Lexer gave us nothing, exit.
 		return;
 	}
 	

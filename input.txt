@@ -1,6 +1,7 @@
-! this is comment for this sample test code for arithmetic expressions!
+! Find the sum between two numbers!
 
-a + b;
-c+d;
-e-f;
-g*n;
+int num, nu2m, sum;
+num = 0;
+nu2m = 15;
+sum = 0;
+sum = num + nu2m;
