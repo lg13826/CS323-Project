@@ -367,7 +367,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
  		if(tableEntry[0]== 'S'){
 			// push input on to Stack then push number from table entry, increment line
 			characterStack.push(*place);
-			std::string number = atoi(tableEntry.c_str()+1);
+			auto number = atoi(tableEntry.c_str()+1);
 			characterStack.push(number);
 			place++;
 			// if R do reduce process
