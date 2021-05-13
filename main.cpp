@@ -367,13 +367,13 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
  		if(tableEntry[0]== 'S'){
 			// push input on to Stack then push number from table entry, increment line
 			characterStack.push(*place);
-			std::string number = tableEntry.substr(1,2);
+			std::string number = atoi(tableEntry.c_str()+1);
 			characterStack.push(number);
 			place++;
 			// if R do reduce process
 		}else if (tableEntry[0] == 'R'){
 			// holds counter for popping
-		 auto g = 2*stoi(tableEntry,(std::size_t) 1);
+		 auto g = 2 * atoi(tableEntry.c_str()+1);
 			//loop to pop stack specified amount of times
 			for(int f = 0; f<g ; f++){
 				characterStack.pop();
