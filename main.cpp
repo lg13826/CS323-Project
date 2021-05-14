@@ -765,7 +765,7 @@ int main()
 			}
 			else if (isSeperator(entity))
 			{
-				if (entity = ';')
+				if (entity == ';')
 				{
 					syntax(a_line, tokenArray);
 					a_line.clear();
