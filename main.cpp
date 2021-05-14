@@ -224,7 +224,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 	// and Non-Terminal Symbol the lexer encounters IN ORDER.
 
 	//Bottom-up Table Definitions initialization
-	std::string bottomUpTable[11][11];
+	std::string bottomUpTable[12][12];
 	bottomUpTable[0][TS_ID] = "S5";
 	bottomUpTable[0][TS_L_PARENS] = "S5";
 	bottomUpTable[0][NTS_E] = "1";
@@ -348,53 +348,56 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 		return;
 	}
 
-	// bool to exist loop
+    // bool to exist loop
 	bool acct = false;
 	bool error = false;
-	// iteratoer for string array of input
-	std::vector<std::string >:: const_iterator place = input.begin();
-
-
-	while(!acct || !error){
+	do {
 		//holds top of nstack for table indexing
-		int qm = atoi(characterStack.top().c_str());
+		std::string qm = characterStack.top();
 		// holds input string for table indexing
-		Symbols i = lexer(*place);
+        std::vector<std::string >:: const_iterator currLexeme = input.begin();
+        auto currToken = lexer(*currLexeme);
 		// x hold table index spot
-		std::string tableEntry = bottomUpTable[qm][i];
-
-// if string x[0] == S process shift
- 		if(tableEntry[0]== 'S'){
+		std::string tableEntry = bottomUpTable[atoi(qm.c_str())][currToken];
+		// if string x[0] == S process shift
+ 		if(tableEntry[0] == 'S')
+		 {
 			// push input on to Stack then push number from table entry, increment line
-			characterStack.push(*place);
+			characterStack.push(std::to_string(currToken));
 			auto number = atoi(tableEntry.c_str()+1);
-			characterStack.push(number);
-			place++;
+			characterStack.push(std::to_string(number));
 			// if R do reduce process
-		}else if (tableEntry[0] == 'R'){
+		}
+		else if (tableEntry[0] == 'R')
+		{
 			// holds counter for popping
-		 auto g = 2 * atoi(tableEntry.c_str()+1);
+			auto g = 2 * atoi(tableEntry.c_str()+1);
 			//loop to pop stack specified amount of times
-			for(int f = 0; f<g ; f++){
+			for(int f = 0; f<g ; f++)
+			{
 				characterStack.pop();
 			}
 			// qj holds top of stack
-			  int qj =  atoi(characterStack.top().substr(1,2));
-				// qk holds table index qj, stack top
-				std:: string qk = bottomUpTable[qj][lexer(*place)];
-				// push qk onto stack individually
-				for(int k = 0; k< qk.length()-1; k++){
-					characterStack.push(qk.substr(k,1));
-				}
-
-					// if end of line, accept
-			}else if (tableEntry[0] == '$'){
-				acct = true;
-				// if does not work in table, error = true
-			}else{
-				error =true;
+			int qj = atoi(characterStack.top().c_str());
+			// qk holds table index qj, stack top
+			std:: string qk = bottomUpTable[qj][currToken];
+			// push qk onto stack individually
+			for(int k = 0; k < qk.length()-1; k++)
+			{
+				characterStack.push(qk);
 			}
 		}
+		else if (tableEntry[0] == '$')
+		{
+			acct = true;
+		}
+		else
+		{
+        	std::cout << "There was an error when going through your stack.\n";
+			error = true;
+			exit(EXIT_FAILURE);
+		}
+	} while(!acct || !error);
 
 
 
@@ -705,7 +708,6 @@ int main()
 			ignoreComment(entity, inputf);
 			continue;
 		}
-
 
 		if (isOperator(entity))
 		{
