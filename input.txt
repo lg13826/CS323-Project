@@ -4,3 +4,5 @@
 int num = 3/(5*2);
 int num2 = 5*5;
 int num3 = 5+5;
+bool foo = 0;
+float boo = 1;

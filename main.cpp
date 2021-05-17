@@ -11,7 +11,8 @@
 #include <queue>
 
 std::string symbolTable[25][2];
-int INDEX_ROW = 0;
+std::string tableOutput;
+static int INDEX_ROW = 0;
 int startingPosition = 0;
 int memoryLocation = 2000;
 
@@ -373,6 +374,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 			return;
 		}
 		input.pop_front();
+		tableOutput += symbolTable[INDEX_ROW-1][0] + "  \t\t" + symbolTable[INDEX_ROW-1][1] + "  \t\t" + symbolTable[INDEX_ROW-1][2] + "\n"; 
 	}
 
 	for (int i = 0; i < INDEX_ROW; i++)
@@ -472,6 +474,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 		{
 			acct = true;
 			std::cout <<"Syntax Accepted.\n";
+			std::cout << "\n";
 			return;
 		}
 		else
@@ -749,7 +752,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 
 int main()
 {
-	bool debugMode = true; // disables user interface and loads input.txt automatically
+	bool debugMode = false; // disables user interface and loads input.txt automatically
 
 	char entity;
 	std::string a_line;
@@ -775,13 +778,13 @@ int main()
 
 
 	std::ofstream outputf("output.txt");
-	outputf << "Group Members: Kim Eaton, Luciano Gibertoni, Yanessa Vazquez" << std::endl << std::endl;
+	outputf << "Group Members: Kim Eaton, Luciano Gibertoni, Yanessa Vazquez, Cooper Santillan, Eduardo Rayo" << std::endl << std::endl;
+	outputf << "IDENTIFIER\tMEMORYLOCATION\tTYPE" << std::endl;
 
 	std::vector<char> word; // this will push characters into a vector for when word is being processed...
 	bool wordFormulation = false; // this will be a sentry value to check if word formulation is being done, default false.
 
 	std::queue<TokenType> tokenArray; // this will be used to check what to output in the syntax section
-
 	while (inputf.eof() == false) // go through input.txt and read each word.
 	{
 		inputf >> entity;
@@ -866,21 +869,7 @@ int main()
 		}
 	}
 
-	outputf << "IDENTIFIER\tMEMORYLOCATION\tTYPE" << std::endl;
-	for (int i = 0; i <= INDEX_ROW; i++)
-	{
-		for(int j = 0; j < 3; j++)
-		{
-			outputf << symbolTable[i][j] << "  \t\t";
-			std::cout << symbolTable[i][j] << "  \t\t";
-		}
-		outputf << std::endl;
-		std::cout << std::endl;
-	}
-
-	std::cout << symbolTable[0][0] << "  \t\t";
-	std::cout << symbolTable[0][1] << "  \t\t";
-	std::cout << symbolTable[0][2] << "  \t\t";
+	outputf << tableOutput << std::endl;
 
 	inputf.close();
 	return 0;
