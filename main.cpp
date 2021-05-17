@@ -10,6 +10,10 @@
 #include <stack>
 #include <queue>
 
+std::string symbolTable[25][2];
+int INDEX_ROW = 0;
+int startingPosition = 0;
+int memoryLocation = 2000;
 
 enum TokenType
 {
@@ -192,7 +196,6 @@ Symbols lexer(std::string a){
 				return TS_INVALID;
 			}
 		}
-
 	}
 	char b = c[0];
 	if(b!= '$' && isIdentifier(c)){
@@ -298,10 +301,11 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 	bottomUpTable[11][TS_EOS] = "R5"; //State: 11, Symbol: $, returns R5 Table entry
 	// STATE -- SYMBOL -- TABLE ENTRY
 	// END OF TABLE DEFINITIONS
+	
 
 
 
-	std::vector<std::string> input;
+	std::deque<std::string> input;
 	bool nextWord = false;
 	std::string constructedWord;
 	constructedWord.clear(); // initialized
@@ -315,18 +319,19 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 	for(int f = 0; f < lineString.size(); f++){ // loop through each character
 		constructedWord.push_back(lineString[f]); // push lexer word into line
 
-		if( isOperator(lineString[f]) || lineString[f] == ' ')
-		{
-			input.push_back(constructedWord);
-			constructedWord.clear();
-			continue;
-		}
-
-		if( isOperator(lineString[f+1]) )
+		if( isOperator(lineString[f]) || isSeperator(lineString[f]))
 		{
 			input.push_back(constructedWord);
 			nextWord = true;
 		}
+
+		if( isOperator(lineString[f+1]) || lineString[f+1] == ' ')
+		{
+			input.push_back(constructedWord);
+			constructedWord.clear();
+			f++;
+			continue;
+		}		
 
 		if (nextWord == true)
 		{
@@ -341,7 +346,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 	std::stack<std::string> characterStack; // initialize Stack
 	characterStack.push("$");
 	characterStack.push("0");
-
+	input.push_back("$");
 
 
 	if(lineString.size() == 0){ // if the Lexer gave us nothing, exit.
@@ -351,11 +356,41 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
     // bool to exist loop
 	bool acct = false;
 	bool error = false;
+
+	if (isKeyword(input.front()))
+	{
+
+		symbolTable[INDEX_ROW][1] = memoryLocation;
+		symbolTable[INDEX_ROW][2] = input.front();
+		input.pop_front();
+		symbolTable[INDEX_ROW][0] = input.front();
+		INDEX_ROW++;
+		input.pop_front();
+		memoryLocation++;
+		if (input.empty())
+		{
+			return;
+		}
+		input.pop_front();
+	} 
+
+	for (int i = 0; i < INDEX_ROW; i++)
+	{
+		for(int j = 0; j < 2; j++)
+		{
+			if (symbolTable[i][j] == input.front())
+				{
+					input.pop_front();
+					input.pop_front();
+				}
+		}
+	}
+
 	do {
 		//holds top of nstack for table indexing
 		std::string qm = characterStack.top();
 		// holds input string for table indexing
-        std::vector<std::string >:: const_iterator currLexeme = input.begin();
+        std::deque<std::string >:: const_iterator currLexeme = input.begin();
         auto currToken = lexer(*currLexeme);
 		// x hold table index spot
 		std::string tableEntry = bottomUpTable[atoi(qm.c_str())][currToken];
@@ -366,12 +401,30 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 			characterStack.push(std::to_string(currToken));
 			auto number = atoi(tableEntry.c_str()+1);
 			characterStack.push(std::to_string(number));
+			std::string test = input.front();
+			input.pop_front();
+			std::string test1 = input.front();
 			// if R do reduce process
 		}
 		else if (tableEntry[0] == 'R')
 		{
+			/* Productions
+			int productions[6];
+			productions[1] = 3;
+			productions[2] = 1;
+			productions[3] = 3;
+			productions[4] = 1;
+			productions[5] = 3;
+			productions[6] = 1;
+			*/
+
 			// holds counter for popping
-			auto g = 2 * atoi(tableEntry.c_str()+1);
+			int g;
+			if (currToken == TS_ID || currToken == NTS_F || currToken == NTS_T)
+			{
+				g = 2 * 1;
+			} else g = 2 * 3;
+			
 			//loop to pop stack specified amount of times
 			for(int f = 0; f<g ; f++)
 			{
@@ -780,6 +833,14 @@ int main()
 			word.clear(); // clear word
 			wordFormulation = false;
 			inputf >> std::skipws; // re-enable whitespace skipping for next iteration
+		}
+	}
+
+	for (int i = 0; i < INDEX_ROW; i++)
+	{
+		for(int j = 0; j < 2; j++)
+		{
+			outputf << symbolTable[i][j];
 		}
 	}
 
