@@ -346,7 +346,6 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 	std::stack<std::string> characterStack; // initialize Stack
 	characterStack.push("$");
 	characterStack.push("0");
-	input.push_back("$");
 
 
 	if(lineString.size() == 0){ // if the Lexer gave us nothing, exit.
@@ -359,11 +358,13 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 
 	if (isKeyword(input.front()))
 	{
-
-		symbolTable[INDEX_ROW][1] = memoryLocation;
+		symbolTable[INDEX_ROW][1] = std::to_string(memoryLocation);
+		std::cout<< symbolTable[INDEX_ROW][1];
 		symbolTable[INDEX_ROW][2] = input.front();
+		std::cout<< symbolTable[INDEX_ROW][2];
 		input.pop_front();
 		symbolTable[INDEX_ROW][0] = input.front();
+		std::cout<< symbolTable[INDEX_ROW][0];
 		INDEX_ROW++;
 		input.pop_front();
 		memoryLocation++;
@@ -375,14 +376,10 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 	}
 
 	for (int i = 0; i < INDEX_ROW; i++)
-	{
-		for(int j = 0; j < 2; j++)
+	{ 
+		if(symbolTable[INDEX_ROW][2] == input.front())
 		{
-			if (symbolTable[i][j] == input.front())
-				{
-					input.pop_front();
-					input.pop_front();
-				}
+			input.pop_front();
 		}
 	}
 
@@ -869,13 +866,21 @@ int main()
 		}
 	}
 
-	for (int i = 0; i < INDEX_ROW; i++)
+	outputf << "IDENTIFIER\tMEMORYLOCATION\tTYPE" << std::endl;
+	for (int i = 0; i <= INDEX_ROW; i++)
 	{
-		for(int j = 0; j < 2; j++)
+		for(int j = 0; j < 3; j++)
 		{
-			outputf << symbolTable[i][j];
+			outputf << symbolTable[i][j] << "  \t\t";
+			std::cout << symbolTable[i][j] << "  \t\t";
 		}
+		outputf << std::endl;
+		std::cout << std::endl;
 	}
+
+	std::cout << symbolTable[0][0] << "  \t\t";
+	std::cout << symbolTable[0][1] << "  \t\t";
+	std::cout << symbolTable[0][2] << "  \t\t";
 
 	inputf.close();
 	return 0;

@@ -1,2 +1,7 @@
 Group Members: Kim Eaton, Luciano Gibertoni, Yanessa Vazquez
 
+IDENTIFIER	MEMORYLOCATION	TYPE
+num  		2000  		num2  		
+num2  		2001  		num3  		
+num3  		2002  		int  		
+int  		  		  		
