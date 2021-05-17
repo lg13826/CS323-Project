@@ -1,3 +1,6 @@
 ! Find the sum between two numbers!
 
-int num = 5;
+
+int num = 3/(5*2);
+int num2 = 5*5;
+int num3 = 5+5;

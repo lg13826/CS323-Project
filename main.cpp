@@ -225,7 +225,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 	// Lexer gives us a Line that needs to be cleaned up
 	// token Array is the list of every Terminal Symbol
 	// and Non-Terminal Symbol the lexer encounters IN ORDER.
-
+	std::cout << "Made it to Syntax\n";
 	//Bottom-up Table Definitions initialization
 	std::string bottomUpTable[12][12];
 	bottomUpTable[0][TS_ID] = "S5";
@@ -301,7 +301,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 	bottomUpTable[11][TS_EOS] = "R5"; //State: 11, Symbol: $, returns R5 Table entry
 	// STATE -- SYMBOL -- TABLE ENTRY
 	// END OF TABLE DEFINITIONS
-	
+
 
 
 
@@ -331,7 +331,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 			constructedWord.clear();
 			f++;
 			continue;
-		}		
+		}
 
 		if (nextWord == true)
 		{
@@ -372,7 +372,7 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 			return;
 		}
 		input.pop_front();
-	} 
+	}
 
 	for (int i = 0; i < INDEX_ROW; i++)
 	{
@@ -390,24 +390,33 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 		//holds top of nstack for table indexing
 		std::string qm = characterStack.top();
 		// holds input string for table indexing
+				std::cout << "Top of While loop\n";
         std::deque<std::string >:: const_iterator currLexeme = input.begin();
+				std::cout << "Current Lexeme: " << *currLexeme << "\n";
         auto currToken = lexer(*currLexeme);
+				std::cout << "Top of Character Stack: " << characterStack.top() <<"\n";
 		// x hold table index spot
 		std::string tableEntry = bottomUpTable[atoi(qm.c_str())][currToken];
+		std:: cout << "Table Entry: " << tableEntry << "\n";
 		// if string x[0] == S process shift
  		if(tableEntry[0] == 'S')
 		 {
+			 std::cout << "In S\n";
 			// push input on to Stack then push number from table entry, increment line
 			characterStack.push(std::to_string(currToken));
+			std:: cout << "Pushed " << currToken << " onto Stack." << "\n";
 			auto number = atoi(tableEntry.c_str()+1);
 			characterStack.push(std::to_string(number));
 			std::string test = input.front();
+			std::cout << "Pop " << test << " from input.\n";
 			input.pop_front();
+
 			std::string test1 = input.front();
 			// if R do reduce process
 		}
 		else if (tableEntry[0] == 'R')
 		{
+			std::cout<< "In R\n";
 			/* Productions
 			int productions[6];
 			productions[1] = 3;
@@ -419,30 +428,54 @@ void syntax(std::string lineString, std::queue<TokenType> tokenArray )
 			*/
 
 			// holds counter for popping
+			int tableEntryIndex = atoi(tableEntry.c_str()+1);
 			int g;
-			if (currToken == TS_ID || currToken == NTS_F || currToken == NTS_T)
+
+			if (currToken == TS_ID || currToken == NTS_F || currToken == NTS_T || currToken == TS_EOS || TS_PLUS)
 			{
 				g = 2 * 1;
 			} else g = 2 * 3;
-			
+
 			//loop to pop stack specified amount of times
 			for(int f = 0; f<g ; f++)
-			{
+			{ if(!characterStack.empty() && characterStack.top() != "$"){
+				std::cout << "Stack Popped " << f << "\n";
 				characterStack.pop();
 			}
+			}
 			// qj holds top of stack
+			std::cout << "Top of Stack: " << characterStack.top() <<"\n";
 			int qj = atoi(characterStack.top().c_str());
+			std::cout<< "Table Entry Index" << tableEntryIndex <<"\n";
 			// qk holds table index qj, stack top
-			std:: string qk = bottomUpTable[qj][currToken];
-			// push qk onto stack individually
-			for(int k = 0; k < qk.length()-1; k++)
-			{
+			if(tableEntryIndex == 6 || tableEntryIndex == 5){
+			std::cout << "Push table at [" << qj <<"]["<< NTS_F <<"]\n";
+			std:: string qk = bottomUpTable[qj][NTS_F];
+			std::cout << "Push: " << qk << "onto Stack.\n";
+			characterStack.push("F");
+			characterStack.push(qk);
+		}
+			if(tableEntryIndex == 4 || tableEntryIndex == 3){
+				std::cout << "Push table at [" << qj <<"]["<< NTS_F <<"]\n";
+				std:: string qk = bottomUpTable[qj][NTS_F];
+				std::cout << "Push: " << qk << "onto Stack.\n";
+				characterStack.push("T");
 				characterStack.push(qk);
 			}
+			if(tableEntryIndex == 2 || tableEntryIndex == 1 ){
+				std::cout << "Push table at [" << qj <<"]["<< NTS_F <<"]\n";
+				std:: string qk = bottomUpTable[qj][NTS_F];
+				std::cout << "Push: " << qk << "onto Stack.\n";
+				characterStack.push("E");
+				characterStack.push(qk);
+			}
+
 		}
-		else if (tableEntry[0] == '$')
+		else if (characterStack.top() == "$")
 		{
 			acct = true;
+			std::cout <<"Syntax Accepted.\n";
+			return;
 		}
 		else
 		{
