@@ -1,5 +1,5 @@
-//Group Members: Kim Eaton, Luciano Gibertoni, Yanessa Vazquez, Cooper Santillan, Eduardo Rayo
-//Assigment 3
+//Group Members: Kim Eaton, Luciano Gibertoni, Yanessa Vazquez
+//Assigment 1
 
 #include <iostream>
 #include <fstream>
